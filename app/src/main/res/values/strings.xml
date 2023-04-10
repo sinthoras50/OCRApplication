@@ -1,0 +1,37 @@
+<resources>
+    <string name="app_name">OCR App</string>
+    <string name="capture_an_image">Capture an image.</string>
+    <string name="toggle_auto_focus">Toggle auto focus.</string>
+    <string name="switch_flash_mode">Switch flash mode.</string>
+    <string name="clear_bounding_box">Clear previously assigned bounding box.</string>
+    <string name="rotate_img">Rotate the image right by 90 degrees</string>
+    <string name="field_name">Field name</string>
+    <string name="layout_editor">Layout Editor</string>
+    <string name="pick_image_gallery">Pick an image from the gallery.</string>
+    <string name="save_bounding_boxes">Confirm and save bounding boxes.</string>
+    <string name="overview">Overview</string>
+    <string name="previous_template">Switch to previous template.</string>
+    <string name="delete_template">Delete current template.</string>
+    <string name="confirm_template">Confirm current template.</string>
+    <string name="edit_template">Edit current template.</string>
+    <string name="next_template">Switch to next template</string>
+    <string name="create_template">Create a new template.</string>
+    <string name="new_layout">New Layout</string>
+    <string name="select_template_desc">Select an image to be used as a template</string>
+    <string name="gallery">Gallery</string>
+    <string name="camera">Camera</string>
+    <string name="template_name_edit">Template name edit box</string>
+    <string name="save">Save</string>
+    <string-array name="formFields">
+        <item>amount</item>
+        <item>variable symbol</item>
+        <item>constant symbol</item>
+        <item>specific symbol</item>
+        <item>note</item>
+        <item>iban</item>
+        <item>swift</item>
+        <item>beneficiary name</item>
+        <item>beneficiary address 1</item>
+        <item>beneficiary address 2</item>
+    </string-array>
+</resources>

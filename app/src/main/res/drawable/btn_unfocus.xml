@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:height="24dp"
+        android:width="24dp"
+        android:drawable="@drawable/ic_baseline_center_focus_weak_24" />
+    <item
+        android:height="17dp"
+        android:width="17dp"
+        android:gravity="center"
+        android:drawable="@drawable/ic_baseline_do_disturb_24" />
+
+</layer-list>

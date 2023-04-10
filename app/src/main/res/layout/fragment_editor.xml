@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="100"
+    android:orientation="vertical"
+    android:background="@color/blue_bg"
+    tools:context=".ui.editor.EditorFragment">
+
+    <carbon.widget.ConstraintLayout
+        android:id="@+id/editorControls"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/carbon_blue_a700"
+        android:layout_weight="30">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/controlsCardView"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:elevation="10dp"
+            android:translationZ="10dp"
+            app:cardCornerRadius="15dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/editorVerticalGuideline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_begin="168dp" />
+
+                <Spinner
+                    android:id="@+id/spinnerFormFields"
+                    android:layout_width="0dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="5dp"
+                    android:background="@color/white"
+
+
+                    android:elevation="3dp"
+                    android:spinnerMode="dropdown"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/editorVerticalGuideline"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+                <Button
+                    android:id="@+id/btnClearBoundingBox"
+                    style="?attr/materialIconButtonFilledTonalStyle"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="5dp"
+                    android:contentDescription="@string/clear_bounding_box"
+                    android:elevation="3dp"
+                    android:insetLeft="0dp"
+                    android:insetTop="0dp"
+                    android:insetRight="0dp"
+                    android:insetBottom="0dp"
+                    android:minWidth="1dp"
+                    android:minHeight="1dp"
+                    app:icon="@drawable/ic_baseline_arrow_back_24"
+                    app:iconGravity="textEnd"
+                    app:iconPadding="0dp"
+
+                    app:iconSize="15dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/spinnerFormFields"
+                    app:layout_constraintStart_toStartOf="@+id/editorVerticalGuideline"
+                    app:layout_constraintTop_toTopOf="@+id/spinnerFormFields"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Material3.Button" />
+
+                <Button
+                    android:id="@+id/btnRotate90DegRight"
+                    style="?attr/materialIconButtonFilledTonalStyle"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginEnd="10dp"
+                    android:contentDescription="@string/rotate_img"
+                    android:elevation="3dp"
+                    android:insetLeft="0dp"
+                    android:insetTop="0dp"
+                    android:insetRight="0dp"
+                    android:insetBottom="0dp"
+                    android:minWidth="1dp"
+                    android:minHeight="1dp"
+                    app:icon="@drawable/ic_baseline_rotate_right_24"
+
+                    app:iconGravity="textEnd"
+                    app:iconPadding="0dp"
+                    app:iconSize="15dp"
+                    app:layout_constraintBottom_toTopOf="@+id/editorRadioGroup"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Material3.Button" />
+
+                <RadioGroup
+                    android:id="@+id/editorRadioGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:layout_marginEnd="10dp"
+                    android:orientation="horizontal"
+                    app:layout_constraintBottom_toBottomOf="@+id/spinnerFormFields"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/spinnerFormFields">
+
+                    <RadioButton
+                        android:id="@+id/radioBtnMove"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_marginEnd="5dp"
+                        android:background="@drawable/btn_move"
+                        android:button="@null"
+                        android:checked="true"
+                        android:elevation="3dp"
+                        android:enabled="false"
+                        android:text="" />
+
+                    <RadioButton
+                        android:id="@+id/radioBtnEdit"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:background="@drawable/btn_edit"
+                        android:button="@null"
+                        android:elevation="3dp"
+                        android:enabled="false"
+                        android:text="" />
+
+                    <RadioButton
+                        android:id="@+id/radioBtnSelect"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_marginStart="5dp"
+                        android:background="@drawable/btn_select"
+                        android:button="@null"
+                        android:elevation="3dp"
+                        android:enabled="false"
+                        android:text="" />
+                </RadioGroup>
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/carbon_blue_a700"
+                    android:textSize="20sp"
+                    android:text="@string/field_name"
+                    app:layout_constraintBottom_toTopOf="@+id/spinnerFormFields"
+                    app:layout_constraintStart_toStartOf="@+id/spinnerFormFields"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/textTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/layout_editor"
+            android:textColor="@color/white"
+            android:textSize="40sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/controlsCardView"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </carbon.widget.ConstraintLayout>
+
+    <carbon.widget.ConstraintLayout
+        android:id="@+id/editorImage"
+        android:background="@color/blue_bg"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="50">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/editorCardView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="20dp"
+            android:backgroundTint="@color/carbon_lightGreen_50"
+            android:layoutDirection="rtl"
+            android:elevation="10dp"
+            android:translationZ="10dp"
+            android:minHeight="200dp"
+            app:cardCornerRadius="15dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.example.templateeditorapp.ui.editor.MyPhotoView
+                android:id="@+id/loadedImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:adjustViewBounds="true"
+                android:src="@null" />
+
+        </androidx.cardview.widget.CardView>
+
+    </carbon.widget.ConstraintLayout>
+
+    <carbon.widget.ConstraintLayout
+        android:id="@+id/editorImageLoader"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="20"
+        android:background="@drawable/background_white_blue_60">
+
+        <Button
+            style="?attr/materialIconButtonFilledTonalStyle"
+            android:id="@+id/btnLoadImage"
+            android:minWidth="1dp"
+            android:minHeight="1dp"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:elevation="10dp"
+            android:translationZ="10dp"
+            android:contentDescription="@string/pick_image_gallery"
+            android:visibility="gone"
+            app:icon="@drawable/ic_baseline_insert_photo_24"
+            app:iconSize="40dp"
+            app:iconGravity="textEnd"
+            app:iconPadding="0dp"
+            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Material3.Button"
+            android:insetLeft="0dp"
+            android:insetTop="0dp"
+            android:insetRight="0dp"
+            android:insetBottom="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5" />
+
+        <Button
+            android:id="@+id/btnConfirmImage"
+            style="?attr/materialIconButtonFilledTonalStyle"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:contentDescription="@string/save_bounding_boxes"
+            android:insetLeft="0dp"
+            android:insetTop="0dp"
+            android:insetRight="0dp"
+            android:insetBottom="0dp"
+            android:minWidth="1dp"
+            android:minHeight="1dp"
+            app:icon="@drawable/ic_baseline_done_24"
+            app:iconGravity="textEnd"
+            app:iconPadding="0dp"
+            app:iconSize="40dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Material3.Button" />
+    </carbon.widget.ConstraintLayout>
+</LinearLayout>

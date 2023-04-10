@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_navigation"
+    app:startDestination="@id/overviewFragment">
+
+    <fragment
+        android:id="@+id/overviewFragment"
+        android:name="com.example.templateeditorapp.ui.overview.OverviewFragment"
+        android:label="OverviewFragment"
+        tools:layout="@layout/fragment_overview">
+        <action
+            android:id="@+id/action_overviewFragment_to_cameraFragment"
+            app:destination="@id/cameraFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
+        <action
+            android:id="@+id/action_overviewFragment_to_editorFragment"
+            app:destination="@id/editorFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
+        <action
+            android:id="@+id/action_overviewFragment_to_templateSelectionFragment"
+            app:destination="@id/templateSelectionFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/cameraFragment"
+        android:name="com.example.templateeditorapp.ui.opencv.CameraFragment"
+        android:label="CameraFragment"
+        tools:layout="@layout/fragment_camera" >
+        <action
+            android:id="@+id/action_cameraFragment_to_testingFragment"
+            app:destination="@id/testingFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/editorFragment"
+        android:name="com.example.templateeditorapp.ui.editor.EditorFragment"
+        android:label="fragment_editor"
+        tools:layout="@layout/fragment_editor" >
+        <action
+            android:id="@+id/action_editorFragment_to_overviewFragment"
+            app:destination="@id/overviewFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/testingFragment"
+        android:name="com.example.templateeditorapp.ui.testing.TestingFragment"
+        android:label="TestingFragment"
+        tools:layout="@layout/fragment_testing"/>
+    <fragment
+        android:id="@+id/templateSelectionFragment"
+        android:name="com.example.templateeditorapp.ui.overview.TemplateSelectionFragment"
+        android:label="fragment_template_selection"
+        tools:layout="@layout/fragment_template_selection" >
+        <action
+            android:id="@+id/action_templateSelectionFragment_to_editorFragment"
+            app:destination="@id/editorFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right"
+            app:popUpTo="@id/overviewFragment" />
+        <action
+            android:id="@+id/action_templateSelectionFragment_to_templateCameraFragment"
+            app:destination="@id/templateCameraFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/templateCameraFragment"
+        android:name="com.example.templateeditorapp.ui.camera.TemplateCameraFragment"
+        android:label="TemplateCameraFragment"
+        tools:layout="@layout/fragment_camera">
+        <action
+            android:id="@+id/action_templateCameraFragment_to_editorFragment"
+            app:destination="@id/editorFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right"
+            app:popUpTo="@id/overviewFragment" />
+    </fragment>
+</navigation>
