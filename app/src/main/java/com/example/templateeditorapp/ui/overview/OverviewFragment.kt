@@ -15,12 +15,10 @@ import com.example.templateeditorapp.OcrApp
 import com.example.templateeditorapp.R
 import com.example.templateeditorapp.databinding.FragmentOverviewBinding
 import com.example.templateeditorapp.db.ImageDatabase
+import com.example.templateeditorapp.utils.OVERVIEW_KEY
 import com.example.templateeditorapp.utils.TAG_IMAGE
+import com.example.templateeditorapp.utils.TEMPLATE_KEY
 
-const val TEMP_PHOTO_KEY = "picture"
-const val TEMP_PHOTO_PATH = "temporary_photo"
-const val TEMPLATE_KEY = "template"
-const val OVERVIEW_KEY = "overview_key"
 
 class OverviewFragment : Fragment() {
 

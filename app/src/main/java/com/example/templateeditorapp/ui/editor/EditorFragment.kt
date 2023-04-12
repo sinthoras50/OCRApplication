@@ -25,10 +25,10 @@ import com.example.templateeditorapp.OcrApp
 import com.example.templateeditorapp.R
 import com.example.templateeditorapp.databinding.FragmentEditorBinding
 import com.example.templateeditorapp.db.ImageDatabase
-import com.example.templateeditorapp.ui.overview.OVERVIEW_KEY
-import com.example.templateeditorapp.ui.overview.TEMPLATE_KEY
-import com.example.templateeditorapp.ui.overview.TEMP_PHOTO_KEY
+import com.example.templateeditorapp.utils.OVERVIEW_KEY
 import com.example.templateeditorapp.utils.TAG_IMAGE
+import com.example.templateeditorapp.utils.TEMPLATE_KEY
+import com.example.templateeditorapp.utils.TEMP_PHOTO_KEY
 
 const val PICK_IMAGE = 1
 const val DEBUG = "DEBUG"
@@ -148,7 +148,7 @@ class EditorFragment : Fragment() {
                 }
                 binding.radioBtnSelect.id -> {
                     binding.loadedImage.setOnTouchListener {view, event ->
-                        viewModel.onTouchListenerSelect(view, event, spinner)
+                        viewModel.onTouchListenerSelect(view, event)
                     }
                 }
             }

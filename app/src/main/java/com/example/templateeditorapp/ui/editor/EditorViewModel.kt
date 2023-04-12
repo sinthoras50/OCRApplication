@@ -254,7 +254,7 @@ class EditorViewModel(val database: ImageDatabase) : ViewModel() {
         return true
     }
 
-    fun onTouchListenerSelect(view: View, event: MotionEvent, spinner: Spinner): Boolean {
+    fun onTouchListenerSelect(view: View, event: MotionEvent): Boolean {
         val photoView = view as MyPhotoView
 
         when (event.actionMasked) {

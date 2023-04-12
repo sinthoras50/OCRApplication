@@ -44,6 +44,13 @@
             app:exitAnim="@android:anim/slide_out_right"
             app:popEnterAnim="@android:anim/slide_in_left"
             app:popExitAnim="@android:anim/slide_out_right" />
+        <action
+            android:id="@+id/action_cameraFragment_to_tesseractFragment"
+            app:destination="@id/tesseractFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/editorFragment"
@@ -94,4 +101,22 @@
             app:popExitAnim="@android:anim/slide_out_right"
             app:popUpTo="@id/overviewFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/tesseractFragment"
+        android:name="com.example.templateeditorapp.ui.tesseract.TesseractFragment"
+        android:label="fragment_tesseract"
+        tools:layout="@layout/fragment_tesseract" >
+        <action
+            android:id="@+id/action_tesseractFragment_to_qrGeneratorFragment"
+            app:destination="@id/qrGeneratorFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/qrGeneratorFragment"
+        android:name="com.example.templateeditorapp.ui.qrgen.QrGeneratorFragment"
+        android:label="fragment_qr_generator"
+        tools:layout="@layout/fragment_qr_generator" />
 </navigation>

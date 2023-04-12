@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/blue_bg"
+    android:weightSum="100"
+    tools:context=".ui.tesseract.TesseractFragment">
+
+    <carbon.widget.ConstraintLayout
+        android:id="@+id/formTitleContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="15"
+
+        android:background="@color/carbon_blue_a700">
+
+        <TextView
+            android:id="@+id/transactionFormTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="20dp"
+            android:text="Transaction Details"
+            android:textColor="@color/white"
+            android:textSize="40sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </carbon.widget.ConstraintLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="68">
+
+        <carbon.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/blue_bg">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/recipientNameContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/recipientNameTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginBottom="-10dp"
+                    android:background="@color/blue_bg"
+                    android:elevation="2dp"
+                    android:outlineProvider="none"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="Recipient"
+                    android:textColor="@color/purple_500"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toTopOf="@+id/recipientNameEditText"
+                    app:layout_constraintStart_toStartOf="@+id/recipientNameEditText" />
+
+                <EditText
+                    android:id="@+id/recipientNameEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="43dp"
+                    android:layout_marginStart="25dp"
+                    android:layout_marginEnd="25dp"
+                    android:background="@drawable/edittext_border"
+                    android:ems="10"
+                    android:inputType="textPersonName"
+                    android:paddingStart="12dp"
+                    android:paddingTop="5dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="5dp"
+                    android:text=""
+                    android:hint="Recipient"
+                    android:textSize="15sp"
+                    android:drawableStart="@drawable/edittext_icon_text"
+                    android:drawablePadding="5dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/ibanContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/recipientNameContainer">
+
+                <TextView
+                    android:id="@+id/ibanTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginBottom="-10dp"
+                    android:background="@color/blue_bg"
+                    android:elevation="2dp"
+                    android:outlineProvider="none"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="Iban"
+                    android:textColor="@color/purple_500"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toTopOf="@+id/ibanEditText"
+                    app:layout_constraintStart_toStartOf="@+id/ibanEditText" />
+
+                <EditText
+                    android:id="@+id/ibanEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="43dp"
+                    android:layout_marginStart="25dp"
+                    android:layout_marginEnd="25dp"
+                    android:background="@drawable/edittext_border"
+                    android:ems="10"
+                    android:inputType="textPersonName"
+                    android:paddingStart="12dp"
+                    android:paddingTop="5dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="5dp"
+                    android:text=""
+                    android:hint="IBAN"
+                    android:textSize="15sp"
+                    android:drawableStart="@drawable/edittext_icon_text"
+                    android:drawablePadding="5dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/amountContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/ibanContainer">
+
+                <TextView
+                    android:id="@+id/amountTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginBottom="-10dp"
+                    android:background="@color/blue_bg"
+                    android:elevation="2dp"
+                    android:outlineProvider="none"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="Amount"
+                    android:textColor="@color/purple_500"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toTopOf="@+id/amountEditText"
+                    app:layout_constraintStart_toStartOf="@+id/amountEditText" />
+
+                <EditText
+                    android:id="@+id/amountEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="43dp"
+                    android:layout_marginStart="25dp"
+                    android:layout_marginEnd="25dp"
+                    android:background="@drawable/edittext_border"
+                    android:ems="10"
+                    android:inputType="textPersonName"
+                    android:paddingStart="12dp"
+                    android:paddingTop="5dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="5dp"
+                    android:text=""
+                    android:textSize="15sp"
+                    android:hint="Amount"
+                    android:drawableStart="@drawable/edittext_icon_number"
+                    android:drawablePadding="5dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/variableSymbolContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/amountContainer">
+
+                <TextView
+                    android:id="@+id/variableSymboltTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginBottom="-10dp"
+                    android:background="@color/blue_bg"
+                    android:elevation="2dp"
+                    android:outlineProvider="none"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="Variable symbol"
+                    android:textColor="@color/purple_500"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toTopOf="@+id/variableSymbolEditText"
+                    app:layout_constraintStart_toStartOf="@+id/variableSymbolEditText" />
+
+                <EditText
+                    android:id="@+id/variableSymbolEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="43dp"
+                    android:layout_marginStart="25dp"
+                    android:layout_marginEnd="25dp"
+                    android:background="@drawable/edittext_border"
+                    android:ems="10"
+                    android:inputType="textPersonName"
+                    android:paddingStart="12dp"
+                    android:paddingTop="5dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="5dp"
+                    android:text=""
+                    android:textSize="15sp"
+                    android:hint="Variable symbol"
+                    android:drawableStart="@drawable/edittext_icon_number"
+                    android:drawablePadding="5dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constantSymbolContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/variableSymbolContainer">
+
+                <TextView
+                    android:id="@+id/constantSymbolTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginBottom="-10dp"
+                    android:background="@color/blue_bg"
+                    android:elevation="2dp"
+                    android:outlineProvider="none"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="Constant symbol"
+                    android:textColor="@color/purple_500"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toTopOf="@+id/constantSymbolEditText"
+                    app:layout_constraintStart_toStartOf="@+id/constantSymbolEditText" />
+
+                <EditText
+                    android:id="@+id/constantSymbolEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="43dp"
+                    android:layout_marginStart="25dp"
+                    android:layout_marginEnd="25dp"
+                    android:background="@drawable/edittext_border"
+                    android:ems="10"
+                    android:inputType="textPersonName"
+                    android:paddingStart="12dp"
+                    android:paddingTop="5dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="5dp"
+                    android:text=""
+                    android:textSize="15sp"
+                    android:hint="Constant symbol"
+                    android:drawableStart="@drawable/ic_baseline_numbers_24"
+                    android:drawablePadding="5dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/specificSymbolContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/constantSymbolContainer">
+
+                <TextView
+                    android:id="@+id/specificSymbolTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginBottom="-10dp"
+                    android:background="@color/blue_bg"
+                    android:elevation="2dp"
+                    android:outlineProvider="none"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="Specific symbol"
+                    android:textColor="@color/purple_500"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toTopOf="@+id/specificSymbolEditText"
+                    app:layout_constraintStart_toStartOf="@+id/specificSymbolEditText" />
+
+                <EditText
+                    android:id="@+id/specificSymbolEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="43dp"
+                    android:layout_marginStart="25dp"
+                    android:layout_marginEnd="25dp"
+                    android:background="@drawable/edittext_border"
+                    android:ems="10"
+                    android:inputType="textPersonName"
+                    android:paddingStart="12dp"
+                    android:paddingTop="5dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="5dp"
+                    android:text=""
+                    android:textSize="15sp"
+                    android:hint="Specific symbol"
+                    android:drawableStart="@drawable/edittext_icon_number"
+                    android:drawablePadding="5dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/noteContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/specificSymbolContainer">
+
+                <TextView
+                    android:id="@+id/noteTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginBottom="-10dp"
+                    android:background="@color/blue_bg"
+                    android:elevation="2dp"
+                    android:outlineProvider="none"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="Sender's note"
+                    android:textColor="@color/purple_500"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toTopOf="@+id/noteEditText"
+                    app:layout_constraintStart_toStartOf="@+id/noteEditText" />
+
+                <EditText
+                    android:id="@+id/noteEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="43dp"
+                    android:layout_marginStart="25dp"
+                    android:layout_marginEnd="25dp"
+                    android:background="@drawable/edittext_border"
+                    android:ems="10"
+                    android:inputType="textPersonName"
+                    android:paddingStart="12dp"
+                    android:paddingTop="5dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="5dp"
+                    android:text=""
+                    android:textSize="15sp"
+                    android:hint="Sender's note"
+                    android:drawableStart="@drawable/edittext_icon_text"
+                    android:drawablePadding="5dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/paymentReferenceContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/noteContainer">
+
+                <TextView
+                    android:id="@+id/paymentReferenceTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginBottom="-10dp"
+                    android:background="@color/blue_bg"
+                    android:elevation="2dp"
+                    android:outlineProvider="none"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="Payment reference"
+                    android:textColor="@color/purple_500"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toTopOf="@+id/paymentReferenceEditText"
+                    app:layout_constraintStart_toStartOf="@+id/paymentReferenceEditText" />
+
+                <EditText
+                    android:id="@+id/paymentReferenceEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="43dp"
+                    android:layout_marginStart="25dp"
+                    android:layout_marginEnd="25dp"
+                    android:background="@drawable/edittext_border"
+                    android:ems="10"
+                    android:inputType="textPersonName"
+                    android:paddingStart="12dp"
+                    android:paddingTop="5dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="5dp"
+                    android:text=""
+                    android:textSize="15sp"
+                    android:hint="Payment reference"
+                    android:drawableStart="@drawable/edittext_icon_text"
+                    android:drawablePadding="5dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </carbon.widget.ConstraintLayout>
+    </ScrollView>
+
+
+    <carbon.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="17"
+        android:background="@color/carbon_blue_a700" >
+
+        <ProgressBar
+            android:id="@+id/transactionProgress"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:progress="0"
+            android:scaleY="1.8"
+            android:progressTint="@color/carbon_green_500"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnConfirmForm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Confirm"
+            android:textSize="18sp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            app:cornerRadius="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </carbon.widget.ConstraintLayout>
+
+</LinearLayout>

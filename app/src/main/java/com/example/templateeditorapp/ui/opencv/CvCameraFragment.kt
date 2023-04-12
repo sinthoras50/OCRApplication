@@ -20,10 +20,10 @@ import com.example.templateeditorapp.OcrApp
 import com.example.templateeditorapp.R
 import com.example.templateeditorapp.databinding.FragmentCameraBinding
 import com.example.templateeditorapp.db.ImageDatabase
-
-import com.example.templateeditorapp.ui.overview.TEMPLATE_KEY
-import com.example.templateeditorapp.ui.overview.TEMP_PHOTO_PATH
 import com.example.templateeditorapp.utils.ImageUtils
+import com.example.templateeditorapp.utils.TEMPLATE_KEY
+import com.example.templateeditorapp.utils.TEMP_PHOTO_KEY
+import com.example.templateeditorapp.utils.TEMP_PHOTO_PATH
 import com.google.android.material.button.MaterialButton
 import org.opencv.android.BaseLoaderCallback
 import org.opencv.android.CameraBridgeViewBase
@@ -222,11 +222,19 @@ class CameraFragment : Fragment(), CameraBridgeViewBase.CvCameraViewListener2, P
         val alignedMat = viewModel.alignImage(photoMat, templateMat)
         val resultMat = viewModel.preprocess(alignedMat, PreprocessMethod.THRESH)
         val resultBitmap = ImageUtils.matToBitmap(resultMat)
-        ImageUtils.savePhoto("testing", resultBitmap!!, requireContext())
+//        ImageUtils.savePhoto("testing", resultBitmap!!, requireContext())
+//
+//        val args = Bundle()
+//        args.putString("image","testing")
+//        findNavController().navigate(R.id.action_cameraFragment_to_testingFragment, args)
+
+        ImageUtils.savePhoto(TEMP_PHOTO_PATH, resultBitmap!!, requireContext())
 
         val args = Bundle()
-        args.putString("image","testing")
-        findNavController().navigate(R.id.action_cameraFragment_to_testingFragment, args)
+        args.putString(TEMPLATE_KEY, templateName)
+        args.putString(TEMP_PHOTO_KEY, TEMP_PHOTO_PATH)
+        args.putDouble("scalingFactor", viewModel.scalingFactor!!)
+        findNavController().navigate(R.id.action_cameraFragment_to_tesseractFragment, args)
     }
 
 }

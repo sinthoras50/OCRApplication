@@ -9,7 +9,7 @@
     android:weightSum="100">
 
     <carbon.widget.ConstraintLayout
-        android:id="@+id/overviewTitleContainer"
+        android:id="@+id/formTitleContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="15"
@@ -17,7 +17,7 @@
         android:background="@color/carbon_blue_a700">
 
         <TextView
-            android:id="@+id/templateSelectionTitle"
+            android:id="@+id/transactionFormTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"

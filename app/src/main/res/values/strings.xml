@@ -22,16 +22,15 @@
     <string name="camera">Camera</string>
     <string name="template_name_edit">Template name edit box</string>
     <string name="save">Save</string>
+    <string name="qr_code_image">QR code containing transaction information</string>
     <string-array name="formFields">
+        <item>beneficiary name</item>
+        <item>iban</item>
         <item>amount</item>
         <item>variable symbol</item>
         <item>constant symbol</item>
         <item>specific symbol</item>
         <item>note</item>
-        <item>iban</item>
-        <item>swift</item>
-        <item>beneficiary name</item>
-        <item>beneficiary address 1</item>
-        <item>beneficiary address 2</item>
+        <item>payment reference</item>
     </string-array>
 </resources>

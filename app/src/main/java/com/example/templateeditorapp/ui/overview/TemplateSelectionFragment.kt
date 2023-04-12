@@ -24,6 +24,8 @@ import com.example.templateeditorapp.ui.editor.ImageData
 import com.example.templateeditorapp.ui.editor.PICK_IMAGE
 import com.example.templateeditorapp.utils.ImageUtils
 import com.example.templateeditorapp.utils.TAG_IMAGE
+import com.example.templateeditorapp.utils.TEMP_PHOTO_KEY
+import com.example.templateeditorapp.utils.TEMP_PHOTO_PATH
 
 
 class TemplateSelectionFragment : Fragment() {

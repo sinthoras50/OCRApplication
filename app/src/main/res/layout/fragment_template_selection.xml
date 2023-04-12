@@ -17,7 +17,7 @@
         android:background="@color/carbon_blue_a700" >
 
         <TextView
-            android:id="@+id/templateSelectionTitle"
+            android:id="@+id/transactionFormTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"

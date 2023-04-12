@@ -39,6 +39,8 @@ class CameraViewModel(database: RoomDatabase) : ViewModel() {
 
     private lateinit var preprocessMat: Mat
 
+    var scalingFactor: Double? = null
+
     val focusMode: LiveData<String> = _focusMode
     val flashMode: LiveData<String> = _flashMode
 
@@ -115,6 +117,8 @@ class CameraViewModel(database: RoomDatabase) : ViewModel() {
         val aligned = Mat()
 
         Imgproc.warpPerspective(resizedImage, aligned, model, Size(w.toDouble(), h.toDouble()))
+
+        scalingFactor = w.toDouble() / mat2.cols()
 
         return aligned
 

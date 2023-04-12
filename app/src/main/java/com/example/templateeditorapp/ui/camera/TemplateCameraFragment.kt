@@ -21,11 +21,10 @@ import com.example.templateeditorapp.R
 import com.example.templateeditorapp.databinding.FragmentCameraBinding
 import com.example.templateeditorapp.db.ImageDatabase
 import com.example.templateeditorapp.ui.opencv.*
-import com.example.templateeditorapp.ui.overview.TEMPLATE_KEY
-import com.example.templateeditorapp.ui.overview.TEMP_PHOTO_KEY
-import com.example.templateeditorapp.ui.overview.TEMP_PHOTO_PATH
 import com.example.templateeditorapp.utils.ImageUtils
 import com.example.templateeditorapp.utils.TAG_IMAGE
+import com.example.templateeditorapp.utils.TEMP_PHOTO_KEY
+import com.example.templateeditorapp.utils.TEMP_PHOTO_PATH
 import com.google.android.material.button.MaterialButton
 import org.opencv.android.BaseLoaderCallback
 import org.opencv.android.CameraBridgeViewBase
