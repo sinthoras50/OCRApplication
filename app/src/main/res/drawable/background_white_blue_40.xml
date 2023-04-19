@@ -8,7 +8,7 @@
     </item>
     <item
         android:gravity="bottom"
-        android:top="60dp">
+        android:top="40dp">
         <shape>
             <solid android:color="@color/carbon_blue_a700" />
         </shape>

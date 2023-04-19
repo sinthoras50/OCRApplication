@@ -35,8 +35,8 @@ class QrGeneratorViewModel : ViewModel() {
 
     private fun createTransaction(map: Map<String, String>): Transaction {
         return Transaction(
-            amount = BigDecimal(100),
-            currency = Currency.EUR,
+            amount = BigDecimal(map["amount"]),
+            currency = map["currency"] ?: "EUR",
             iban = map["iban"] ?: "",
             beneficiaryName = map["beneficiary name"] ?: "",
             variableSymbol = map["variable symbol"] ?: "",

@@ -13,7 +13,7 @@ object Assets {
     }
 
     val language: String
-        get() = "slk"
+        get() = "eng"
 
 
     fun extractAssets(context: Context) {

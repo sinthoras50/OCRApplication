@@ -1,19 +1,26 @@
 package com.example.templateeditorapp.ui.tesseract
 
+import android.app.Activity
+import android.graphics.RectF
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
+import androidx.activity.OnBackPressedCallback
+import androidx.core.graphics.toRect
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.navigation.fragment.findNavController
 import com.example.templateeditorapp.OcrApp
 import com.example.templateeditorapp.R
 import com.example.templateeditorapp.databinding.FragmentTesseractBinding
 import com.example.templateeditorapp.db.ImageDatabase
+import com.example.templateeditorapp.ui.qrgen.Currency
 import com.example.templateeditorapp.utils.*
 import com.googlecode.tesseract.android.TessBaseAPI
 import kotlinx.coroutines.*
@@ -49,8 +56,21 @@ class TesseractFragment : Fragment() {
         if (!viewModel.isInitialized()) {
             val dataPath = Assets.getTessDataPath(requireContext())
             val language = Assets.language
-            viewModel.initTesseract(dataPath, language, TessBaseAPI.OEM_LSTM_ONLY)
+            viewModel.initTesseract(dataPath, language, TessBaseAPI.OEM_TESSERACT_LSTM_COMBINED)
         }
+
+        requireActivity().onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (viewModel.isProcessing()) {
+                    viewModel.stop()
+                }
+
+                lifecycleScope.launch {
+                    delay(100)
+                    findNavController().popBackStack()
+                }
+            }
+        })
     }
 
     override fun onCreateView(
@@ -58,16 +78,17 @@ class TesseractFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
+//        binding = DataBindingUtil.setContentView(requireActivity(), R.layout.fragment_tesseract)
         binding = FragmentTesseractBinding.inflate(inflater, container, false)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.resultMap.observe(viewLifecycleOwner) { map ->
-            updateUi(map)
-        }
+        initializeCurrencyDropdown()
 
         viewModel.progress.observe(viewLifecycleOwner) { progress ->
             Log.d(TAG_IMAGE, "progress = $progress")
@@ -77,8 +98,8 @@ class TesseractFragment : Fragment() {
         binding.btnConfirmForm.setOnClickListener {
 
             val args = Bundle()
-            args.putSerializable(OCR_MAP_KEY,
-                viewModel.resultMap.value?.let { map -> HashMap<String, String>(map) })
+            val currency = binding.amountCurrencySpinner.selectedItem.toString()
+            args.putSerializable(OCR_MAP_KEY, viewModel.prepareResultMap(currency))
 
             findNavController().navigate(R.id.action_tesseractFragment_to_qrGeneratorFragment, args)
         }
@@ -86,43 +107,30 @@ class TesseractFragment : Fragment() {
         val imagePath = arguments?.getString(TEMP_PHOTO_KEY)
         val templatePath = arguments?.getString(TEMPLATE_KEY)
         val scalingFactor = arguments?.getDouble("scalingFactor")
+        val cropRect = arguments?.getParcelable(CROP_RECT_KEY) as? RectF?
 
         Log.d(TAG_IMAGE, "fp = $imagePath tp = $templatePath factor = $scalingFactor")
-        viewModel.recognizeImage(imagePath!!, templatePath!!, scalingFactor!!, requireContext())
+        viewModel.recognizeImage(imagePath!!, templatePath!!, scalingFactor!!, requireContext(), cropRect?.toRect())
+
+        binding.btnDebugForm.setOnClickListener {
+            viewModel.recognizeImage(imagePath!!, templatePath!!, scalingFactor!!, requireContext(), cropRect?.toRect())
+        }
 
     }
 
-    private fun updateUi(map: MutableMap<String, String>) {
-        for (key in map.keys) {
-            when(key) {
-                "amount" -> {
-                    binding.amountEditText.setText(map[key])
-                }
-                "variable symbol" -> {
-                    binding.variableSymbolEditText.setText(map[key])
-                }
-                "constant symbol" -> {
-                    binding.constantSymbolEditText.setText(map[key])
-                }
-                "specific symbol" -> {
-                    binding.specificSymbolEditText.setText(map[key])
-                }
-                "note" -> {
-                    binding.noteEditText.setText(map[key])
-                }
-                "iban" -> {
-                    binding.ibanEditText.setText(map[key])
-                }
-                "swift" -> {}
-                "beneficiary name" -> {
-                    binding.recipientNameEditText.setText(map[key])
-                }
-                "beneficiary address 1" -> {}
-                "beneficiary address 2" -> {}
-            }
+    private fun initializeCurrencyDropdown() {
+        val spinner = binding.amountCurrencySpinner
+//        val items = listOf(*resources.getStringArray(R.array.formFieldsCurrency))
+        val items = Currency.values().toList()
+        val adapter = CurrencySpinnerAdapter(requireContext(), items)
+//        adapter.setDropDownViewResource(R.layout.currency_spinner_item)
+        spinner.adapter = adapter
+
+        spinner.setOnTouchListener { view, _ ->
+            val inputManager = requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+            inputManager.hideSoftInputFromWindow(view.windowToken, 0)
+            view.performClick()
+            true
         }
     }
-
-
-
 }

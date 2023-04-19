@@ -2,6 +2,7 @@ package com.example.templateeditorapp.ui.opencv
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.RectF
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,17 +15,18 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.navigation.fragment.findNavController
 import com.example.templateeditorapp.OcrApp
 import com.example.templateeditorapp.R
 import com.example.templateeditorapp.databinding.FragmentCameraBinding
 import com.example.templateeditorapp.db.ImageDatabase
-import com.example.templateeditorapp.utils.ImageUtils
-import com.example.templateeditorapp.utils.TEMPLATE_KEY
-import com.example.templateeditorapp.utils.TEMP_PHOTO_KEY
-import com.example.templateeditorapp.utils.TEMP_PHOTO_PATH
+import com.example.templateeditorapp.utils.*
 import com.google.android.material.button.MaterialButton
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import org.opencv.android.BaseLoaderCallback
 import org.opencv.android.CameraBridgeViewBase
 import org.opencv.android.LoaderCallbackInterface
@@ -214,14 +216,16 @@ class CameraFragment : Fragment(), CameraBridgeViewBase.CvCameraViewListener2, P
         binding.loadingPanel.visibility = View.GONE
 
         val templateName = arguments?.getString(TEMPLATE_KEY)
+        val cropRect = arguments?.getParcelable(CROP_RECT_KEY) as? RectF?
         val templateBitmap = ImageUtils.loadPhoto(templateName!!, requireContext())
         val templateMat = ImageUtils.bitmapToMat(templateBitmap!!)
 
         val photo = ImageUtils.loadPhoto(TEMP_PHOTO_PATH, requireContext())
         val photoMat = ImageUtils.bitmapToMat(photo!!)
-        val alignedMat = viewModel.alignImage(photoMat, templateMat)
+        val alignedMat = viewModel.alignImage(photoMat, templateMat, cropRect = cropRect)
         val resultMat = viewModel.preprocess(alignedMat, PreprocessMethod.THRESH)
         val resultBitmap = ImageUtils.matToBitmap(resultMat)
+
 //        ImageUtils.savePhoto("testing", resultBitmap!!, requireContext())
 //
 //        val args = Bundle()
@@ -234,7 +238,9 @@ class CameraFragment : Fragment(), CameraBridgeViewBase.CvCameraViewListener2, P
         args.putString(TEMPLATE_KEY, templateName)
         args.putString(TEMP_PHOTO_KEY, TEMP_PHOTO_PATH)
         args.putDouble("scalingFactor", viewModel.scalingFactor!!)
+        args.putParcelable(CROP_RECT_KEY, cropRect)
         findNavController().navigate(R.id.action_cameraFragment_to_tesseractFragment, args)
+
     }
 
 }

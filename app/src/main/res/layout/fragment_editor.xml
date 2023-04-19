@@ -187,7 +187,7 @@
         android:background="@color/blue_bg"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="50">
+        android:layout_weight="55">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/editorCardView"
@@ -196,7 +196,7 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="16dp"
             android:backgroundTint="@color/carbon_lightGreen_50"
             android:layoutDirection="rtl"
             android:elevation="10dp"
@@ -223,8 +223,8 @@
         android:id="@+id/editorImageLoader"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="20"
-        android:background="@drawable/background_white_blue_60">
+        android:layout_weight="15"
+        android:background="@drawable/background_white_blue_40">
 
         <Button
             style="?attr/materialIconButtonFilledTonalStyle"
@@ -265,10 +265,11 @@
             android:insetBottom="0dp"
             android:minWidth="1dp"
             android:minHeight="1dp"
-            app:icon="@drawable/ic_baseline_done_24"
+            app:icon="@drawable/ic_baseline_save_24"
             app:iconGravity="textEnd"
             app:iconPadding="0dp"
             app:iconSize="40dp"
+            android:layout_marginBottom="3dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

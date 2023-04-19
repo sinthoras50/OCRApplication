@@ -1,11 +1,14 @@
 package com.example.templateeditorapp.ui.overview
 
+import android.annotation.SuppressLint
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -15,6 +18,7 @@ import com.example.templateeditorapp.OcrApp
 import com.example.templateeditorapp.R
 import com.example.templateeditorapp.databinding.FragmentOverviewBinding
 import com.example.templateeditorapp.db.ImageDatabase
+import com.example.templateeditorapp.utils.CROP_RECT_KEY
 import com.example.templateeditorapp.utils.OVERVIEW_KEY
 import com.example.templateeditorapp.utils.TAG_IMAGE
 import com.example.templateeditorapp.utils.TEMPLATE_KEY
@@ -55,19 +59,37 @@ class OverviewFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentOverviewBinding.inflate(inflater, container, false)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
+
         return binding.root
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.currentImage.observe(viewLifecycleOwner) { bitmap ->
-            binding.overviewImageView.setImageBitmap(bitmap)
+        val images = mutableListOf<Bitmap>()
+
+        val adapter = ViewPagerAdapter(images)
+        binding.viewPager.adapter = adapter
+        binding.viewPager.isUserInputEnabled = false
+
+//        viewModel.currentImage.observe(viewLifecycleOwner) { bitmap ->
+//            binding.overviewImageView.setImageBitmap(bitmap)
+//            adapter.notifyDataSetChanged()
+//        }
+
+        viewModel.imageSet.observe(viewLifecycleOwner) { imageSet ->
+            images.clear()
+            images.addAll(imageSet)
+            adapter.notifyDataSetChanged()
+            binding.viewPager.setCurrentItem(viewModel.currentIdx, false)
         }
 
-        viewModel.currentImageName.observe(viewLifecycleOwner) { name ->
-            binding.templateNameTextView.text = name
-        }
+//        viewModel.currentImageName.observe(viewLifecycleOwner) { name ->
+//            binding.templateNameTextView.text = name
+//        }
 
         val reqWidth = resources.displayMetrics.widthPixels
         val reqHeight = resources.displayMetrics.heightPixels
@@ -79,25 +101,53 @@ class OverviewFragment : Fragment() {
 
 
         if (currentImage != null) {
-            viewModel.loadImages(requireContext(), currentImage, reqWidth, reqHeight)
+//            viewModel.upsertImage(currentImage, requireContext(), reqWidth, reqHeight)
+//            viewModel.loadImages(requireContext(), reqWidth, reqHeight)
+            viewModel.loadImages(currentImage, requireContext(), reqWidth, reqHeight)
+            binding.viewPager.doOnPreDraw {
+                binding.viewPager.setCurrentItem(viewModel.currentIdx, false)
+            }
+            Log.d(TAG_IMAGE, "currentTemplate != null currIdx = ${viewModel.currentIdx}")
         } else {
             viewModel.loadImages(requireContext(), reqWidth, reqHeight)
+            binding.viewPager.doOnPreDraw {
+                binding.viewPager.setCurrentItem(viewModel.currentIdx, false)
+            }
+            Log.d(TAG_IMAGE, "currentTemplate == null currIdx = ${viewModel.currentIdx}")
         }
 
         binding.btnPreviousTemplate.setOnClickListener {
-            viewModel.loadPreviousPhoto(requireContext(), reqWidth, reqHeight)
+            if (viewModel.loadPreviousPhoto()) {
+                binding.viewPager.setCurrentItem(viewModel.currentIdx, true)
+                Log.d(TAG_IMAGE, "current index = ${viewModel.currentIdx}")
+            }
+
+//            viewModel.loadPreviousPhoto(requireContext(), reqWidth, reqHeight)
+
         }
 
+
         binding.btnNextTemplate.setOnClickListener {
-            viewModel.loadNextPhoto(requireContext(), reqWidth, reqHeight)
+            if (viewModel.loadNextPhoto()) {
+                binding.viewPager.setCurrentItem(viewModel.currentIdx, true)
+                Log.d(TAG_IMAGE, "current index = ${viewModel.currentIdx}")
+            }
+
+//            viewModel.loadNextPhoto(requireContext(), reqWidth, reqHeight)
+//            viewModel.loadNextPhoto()
         }
 
         binding.btnDeleteTemplate.setOnClickListener {
-            viewModel.deleteCurrentTemplate(requireContext(), reqWidth, reqHeight)
+//            viewModel.deleteCurrentTemplate(requireContext(), reqWidth, reqHeight)
+            if (viewModel.deleteCurrentTemplate()) {
+                binding.viewPager.setCurrentItem(viewModel.currentIdx, false)
+                Log.d(TAG_IMAGE, "current index = ${viewModel.currentIdx}")
+            }
         }
 
         binding.btnCreateTemplate.setOnClickListener {
             findNavController().navigate(R.id.action_overviewFragment_to_templateSelectionFragment)
+            Log.d(TAG_IMAGE, "current index = ${viewModel.currentIdx}")
         }
 
         binding.btnEditTemplate.setOnClickListener {
@@ -112,9 +162,9 @@ class OverviewFragment : Fragment() {
             val args = Bundle()
             if (viewModel.currentImageName.value.isNullOrEmpty().not()) {
                 args.putString(TEMPLATE_KEY, viewModel.currentImageName.value)
+                args.putParcelable(CROP_RECT_KEY, viewModel.currentImageBoundingBox)
             }
             findNavController().navigate(R.id.action_overviewFragment_to_cameraFragment, args)
-//            findNavController().navigate(R.id.action_overviewFragment_to_cvCameraFragment, args)
         }
 
     }

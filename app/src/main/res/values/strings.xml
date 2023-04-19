@@ -23,6 +23,9 @@
     <string name="template_name_edit">Template name edit box</string>
     <string name="save">Save</string>
     <string name="qr_code_image">QR code containing transaction information</string>
+    <string name="edit_text_template_description">Edit text for template name</string>
+    <string name="edit_text_template_hint">Template name</string>
+    <string name="save_template_dialog_icon">Save template dialog icon</string>
     <string-array name="formFields">
         <item>beneficiary name</item>
         <item>iban</item>
@@ -33,4 +36,10 @@
         <item>note</item>
         <item>payment reference</item>
     </string-array>
+    <string-array name="formFieldsCurrency">
+        <item>EUR</item>
+        <item>USD</item>
+        <item>CZK</item>
+    </string-array>
+
 </resources>

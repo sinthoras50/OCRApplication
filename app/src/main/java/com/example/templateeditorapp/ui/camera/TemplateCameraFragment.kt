@@ -198,6 +198,7 @@ class TemplateCameraFragment : Fragment(), CameraBridgeViewBase.CvCameraViewList
     }
 
     override fun onPictureTaken() {
+        binding.loadingPanel.visibility = View.GONE
         val args = Bundle()
         args.putString(TEMP_PHOTO_KEY, TEMP_PHOTO_PATH)
         findNavController().navigate(R.id.action_templateCameraFragment_to_editorFragment, args)

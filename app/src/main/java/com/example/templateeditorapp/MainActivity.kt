@@ -4,6 +4,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.templateeditorapp.ui.editor.EditorFragment
 import com.example.templateeditorapp.ui.overview.OverviewFragment
+import androidx.activity.viewModels
+import androidx.fragment.app.viewModels
+
 
 class MainActivity : AppCompatActivity() {
 

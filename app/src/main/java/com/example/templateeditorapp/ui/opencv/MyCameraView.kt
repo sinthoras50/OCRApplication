@@ -63,9 +63,10 @@ class MyCameraView(context: Context?, attrs: AttributeSet?) : JavaCameraView(con
         Log.i(TAG, "size = ${size.width}, ${size.height}")
         params.setPictureSize(size.width, size.height)
         mCamera.parameters = params
-
+        mCamera.setPreviewCallback(null)
         mCamera.takePicture(null, null) { data, camera ->
-            camera.startPreview()
+            mCamera.startPreview()
+            mCamera.setPreviewCallback(this@MyCameraView)
             context.openFileOutput("$mPictureFileName.jpg", Context.MODE_PRIVATE).use { stream ->
                 stream.write(data)
                 Log.i(TAG, "File saved")

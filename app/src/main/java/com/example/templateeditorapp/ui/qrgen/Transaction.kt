@@ -1,19 +1,25 @@
 package com.example.templateeditorapp.ui.qrgen
 
+import com.example.templateeditorapp.R
 import org.threeten.bp.LocalDate
 import org.threeten.bp.format.DateTimeFormatter
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-enum class Currency(value: String) {
-    EUR("EUR"),
-    CZK("CZK")
+enum class Currency(val value: String, val image: Int) {
+    EUR("EUR", R.drawable.currency_flag_eu),
+    CZK("CZK", R.drawable.currency_flag_cz),
+    USD("USD", R.drawable.currency_flag_us);
+
+    companion object {
+        val valuesList = values().map { it.value }
+    }
 }
 
 data class Transaction(
     val amount: BigDecimal,
-    val currency: Currency,
+    val currency: String,
     val iban: String,
     val beneficiaryName: String,
     val paymentId: String = "",
@@ -37,6 +43,6 @@ data class Transaction(
     private val incasso = if (isIncasso) "1" else "0"
 
     fun getFormattedData(): String {
-        return "$paymentId\t$paymentType\t$paymentType\t${"%.2f".format(amount)}\t$currency\t$date\t$variableSymbol\t$constantSymbol\t$specificSymbol\t$sepaFormat\t$note\t$paymentTargetAccountType\t$iban\t$swift\t$recurring\t$incasso\t$beneficiaryName\t$beneficiaryAddress1\t$beneficiaryAddress2\t"
+        return "$paymentId\t$paymentType\t$paymentType\t${"%.2f".format(amount)}\t${currency}\t$date\t$variableSymbol\t$constantSymbol\t$specificSymbol\t$sepaFormat\t$note\t$paymentTargetAccountType\t$iban\t$swift\t$recurring\t$incasso\t$beneficiaryName\t$beneficiaryAddress1\t$beneficiaryAddress2\t"
     }
 }

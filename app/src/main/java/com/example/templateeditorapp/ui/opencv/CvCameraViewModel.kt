@@ -1,10 +1,15 @@
 package com.example.templateeditorapp.ui.opencv
 
+import android.graphics.Rect
+import android.graphics.RectF
 import android.hardware.Camera
+import android.util.Log
+import androidx.core.graphics.toRect
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.room.RoomDatabase
+import com.example.templateeditorapp.utils.TAG_IMAGE
 import org.opencv.android.CameraBridgeViewBase
 import org.opencv.calib3d.Calib3d
 import org.opencv.core.*
@@ -29,7 +34,7 @@ enum class FocusMode(val value: String) {
     FIXED(Camera.Parameters.FOCUS_MODE_FIXED)
 }
 
-class CameraViewModel(database: RoomDatabase) : ViewModel() {
+class CameraViewModel(val database: RoomDatabase) : ViewModel() {
 
     private val _focusMode = MutableLiveData<String>(FocusMode.FIXED.value)
     private val _flashMode = MutableLiveData<String>(FlashMode.OFF.value)
@@ -58,16 +63,34 @@ class CameraViewModel(database: RoomDatabase) : ViewModel() {
         camera.takePicture(filename)
     }
 
-    fun alignImage(mat1: Mat, mat2: Mat, maxFeatures: Int = 500, keepPercent: Double = 0.2): Mat {
+    fun cropImage(image: Mat, cropRect: Rect): Mat {
+        val opencvRect = cropRect.let {
+            org.opencv.core.Rect(it.left, it.top, it.width(), it.height())
+        }
+
+        val cropped = image.submat(opencvRect)
+        Log.d(TAG_IMAGE, "width = ${cropped.width()} height = ${cropped.height()}")
+        return cropped
+    }
+
+    fun alignImage(mat1: Mat, mat2: Mat, maxFeatures: Int = 500, keepPercent: Double = 0.2, cropRect: RectF? = null): Mat {
+        var croppedTemplate = Mat()
+
+        if (cropRect != null) {
+            croppedTemplate = cropImage(mat2, cropRect.toRect())
+        }
+
+        val template = if (cropRect != null) croppedTemplate else mat2
+
         val resizedImage = Mat()
         val resizedTemplate = Mat()
 
-        val desiredWidth = min(mat1.width(), mat2.width()).toDouble()
+        val desiredWidth = min(mat1.width(), template.width()).toDouble()
         val aspectRatio1 = mat1.width().toDouble() / mat1.height()
-        val aspectRatio2 = mat2.width().toDouble() / mat2.height()
+        val aspectRatio2 = template.width().toDouble() / template.height()
 
         Imgproc.resize(mat1, resizedImage, Size(desiredWidth, desiredWidth / aspectRatio1))
-        Imgproc.resize(mat2, resizedTemplate, Size(desiredWidth, desiredWidth / aspectRatio2))
+        Imgproc.resize(template, resizedTemplate, Size(desiredWidth, desiredWidth / aspectRatio2))
 
         val grayImage = Mat()
         val grayTemplate = Mat()
@@ -118,7 +141,7 @@ class CameraViewModel(database: RoomDatabase) : ViewModel() {
 
         Imgproc.warpPerspective(resizedImage, aligned, model, Size(w.toDouble(), h.toDouble()))
 
-        scalingFactor = w.toDouble() / mat2.cols()
+        scalingFactor = w.toDouble() / template.cols()
 
         return aligned
 

@@ -2,7 +2,6 @@ package com.example.templateeditorapp.ui.editor
 
 import android.content.ContentResolver
 import android.content.Context
-import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.database.sqlite.SQLiteException
 import android.graphics.*
@@ -10,7 +9,6 @@ import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.text.TextUtils
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Spinner
@@ -22,7 +20,6 @@ import com.example.templateeditorapp.db.AnnotatedImage
 import com.example.templateeditorapp.db.ImageDatabase
 import com.example.templateeditorapp.utils.ImageUtils
 import kotlinx.coroutines.launch
-import java.io.IOException
 import kotlin.math.abs
 
 class EditorViewModel(val database: ImageDatabase) : ViewModel() {
@@ -71,7 +68,7 @@ class EditorViewModel(val database: ImageDatabase) : ViewModel() {
     }
 
     fun updateSpinnerItems(spinner: Spinner) {
-        val adapter = spinner.adapter as MySpinnerAdapter
+        val adapter = spinner.adapter as EditorSpinnerAdapter
         val selected = boundingBoxes.map { it.fieldName }
         for (i in 0 until adapter.count) {
             if (adapter.getItem(i) in selected) {
@@ -127,7 +124,7 @@ class EditorViewModel(val database: ImageDatabase) : ViewModel() {
     fun removeLastBoundingBox(spinner: Spinner, imageMatrix: Matrix) {
         if (boundingBoxes.size == 0) return
 
-        val adapter = spinner.adapter as MySpinnerAdapter
+        val adapter = spinner.adapter as EditorSpinnerAdapter
         val position = adapter.getPosition(boundingBoxes.last().fieldName)
         adapter.enableItem(position)
         spinner.setSelection(position)
@@ -152,7 +149,7 @@ class EditorViewModel(val database: ImageDatabase) : ViewModel() {
 
         if (!containsBoundingBox) return
 
-        val adapter = spinner.adapter as MySpinnerAdapter
+        val adapter = spinner.adapter as EditorSpinnerAdapter
         adapter.enableItem(position)
 
         boundingBoxes.removeIf { it.fieldName == boundingBoxName }
@@ -169,7 +166,7 @@ class EditorViewModel(val database: ImageDatabase) : ViewModel() {
 
     fun onTouchListenerEdit(view: View, event: MotionEvent, spinner: Spinner): Boolean {
         val spinnerSelectedPosition = spinner.selectedItemPosition
-        val adapter = spinner.adapter as MySpinnerAdapter
+        val adapter = spinner.adapter as EditorSpinnerAdapter
         val boundingBoxName = spinner.selectedItem
         val photoView = view as MyPhotoView
 

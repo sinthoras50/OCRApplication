@@ -6,21 +6,22 @@ import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.graphics.Matrix
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.InsetDrawable
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.view.*
-import android.widget.RadioButton
 import androidx.fragment.app.Fragment
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.lifecycle.ViewModel
 import androidx.navigation.fragment.findNavController
-import carbon.widget.Button
-import carbon.widget.EditText
 import com.example.templateeditorapp.OcrApp
 import com.example.templateeditorapp.R
 import com.example.templateeditorapp.databinding.FragmentEditorBinding
@@ -29,11 +30,16 @@ import com.example.templateeditorapp.utils.OVERVIEW_KEY
 import com.example.templateeditorapp.utils.TAG_IMAGE
 import com.example.templateeditorapp.utils.TEMPLATE_KEY
 import com.example.templateeditorapp.utils.TEMP_PHOTO_KEY
+import com.google.android.material.button.MaterialButton
 
 const val PICK_IMAGE = 1
 const val DEBUG = "DEBUG"
 
 class EditorFragment : Fragment() {
+
+    private val minImageScale = 1.0f
+    private val mediumImageScale = 5.0f
+    private val maxImageScale = 10.0f
 
     companion object {
         fun newInstance() = EditorFragment()
@@ -84,6 +90,10 @@ class EditorFragment : Fragment() {
 
         val attacher = binding.loadedImage.attacher
         val spinner = binding.spinnerFormFields
+
+        binding.loadedImage.maximumScale = maxImageScale
+        binding.loadedImage.mediumScale = mediumImageScale
+        binding.loadedImage.minimumScale = minImageScale
 
         initializeDropdown()
 
@@ -180,11 +190,18 @@ class EditorFragment : Fragment() {
             val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.save_template_dialog, null)
             builder.setView(dialogView)
             builder.setCancelable(true)
-
             val dialog = builder.create()
+            val background = ColorDrawable(Color.TRANSPARENT)
+            val marginBg = InsetDrawable(background, 100)
+            dialog.window?.setBackgroundDrawable(marginBg)
 
-            dialogView.findViewById<Button>(R.id.btnSaveTemplate).setOnClickListener {
-                val filename = dialogView.findViewById<EditText>(R.id.templateNameEditText).text.toString()
+            val editText = dialogView.findViewById<AppCompatEditText>(R.id.templateNameEditText)
+            editText.setText(currentTemplate ?: "")
+            Log.d(TAG_IMAGE, "Current template = $currentTemplate")
+
+            dialogView.findViewById<MaterialButton>(R.id.btnSaveTemplate).setOnClickListener {
+
+                val filename = editText.text.toString()
 
                 if (filename.isNotBlank()) {
                     viewModel.saveTemplate(filename, requireContext())
@@ -197,6 +214,10 @@ class EditorFragment : Fragment() {
                 }
             }
 
+            dialogView.findViewById<MaterialButton>(R.id.btnCancelTemplate).setOnClickListener {
+                dialog.cancel()
+            }
+
             dialog.show()
         }
 
@@ -206,8 +227,8 @@ class EditorFragment : Fragment() {
         val spinner = binding.spinnerFormFields
         val items = listOf(*resources.getStringArray(R.array.formFields))
         Log.d(DEBUG, "items = ${items.joinToString(separator=",")}")
-        val adapter = MySpinnerAdapter(requireContext(), R.layout.my_spinner_item, items)
-        adapter.setDropDownViewResource(R.layout.my_spinner_item)
+        val adapter = EditorSpinnerAdapter(requireContext(), R.layout.editor_spinner_item, items)
+        adapter.setDropDownViewResource(R.layout.editor_spinner_item)
         spinner.adapter = adapter
     }
 
