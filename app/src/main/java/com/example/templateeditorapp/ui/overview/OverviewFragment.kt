@@ -1,13 +1,21 @@
 package com.example.templateeditorapp.ui.overview
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
-import android.util.DisplayMetrics
+import android.text.Html
+import android.text.method.LinkMovementMethod
+import android.text.method.MovementMethod
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -18,10 +26,12 @@ import com.example.templateeditorapp.OcrApp
 import com.example.templateeditorapp.R
 import com.example.templateeditorapp.databinding.FragmentOverviewBinding
 import com.example.templateeditorapp.db.ImageDatabase
+import com.example.templateeditorapp.ui.editor.DEBUG
 import com.example.templateeditorapp.utils.CROP_RECT_KEY
 import com.example.templateeditorapp.utils.OVERVIEW_KEY
 import com.example.templateeditorapp.utils.TAG_IMAGE
 import com.example.templateeditorapp.utils.TEMPLATE_KEY
+import com.google.android.material.button.MaterialButton
 
 
 class OverviewFragment : Fragment() {
@@ -78,12 +88,13 @@ class OverviewFragment : Fragment() {
 //        viewModel.currentImage.observe(viewLifecycleOwner) { bitmap ->
 //            binding.overviewImageView.setImageBitmap(bitmap)
 //            adapter.notifyDataSetChanged()
-//        }
+//        } )
 
         viewModel.imageSet.observe(viewLifecycleOwner) { imageSet ->
             images.clear()
             images.addAll(imageSet)
             adapter.notifyDataSetChanged()
+            binding.overviewLoadingPanel.visibility = View.GONE
             binding.viewPager.setCurrentItem(viewModel.currentIdx, false)
         }
 
@@ -138,11 +149,38 @@ class OverviewFragment : Fragment() {
         }
 
         binding.btnDeleteTemplate.setOnClickListener {
-//            viewModel.deleteCurrentTemplate(requireContext(), reqWidth, reqHeight)
-            if (viewModel.deleteCurrentTemplate()) {
-                binding.viewPager.setCurrentItem(viewModel.currentIdx, false)
-                Log.d(TAG_IMAGE, "current index = ${viewModel.currentIdx}")
+
+            Log.d(DEBUG, "opening dialog")
+
+            val builder = AlertDialog.Builder(requireContext())
+            val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.delete_template_dialog, null)
+            builder.setView(dialogView)
+            builder.setCancelable(true)
+            val dialog = builder.create()
+            val background = ColorDrawable(Color.TRANSPARENT)
+            val marginBg = InsetDrawable(background, 100)
+            dialog.window?.setBackgroundDrawable(marginBg)
+
+            dialogView.findViewById<MaterialButton>(R.id.btnDeleteTemplate).setOnClickListener {
+
+                if (viewModel.deleteCurrentTemplate(requireContext())) {
+                    binding.viewPager.setCurrentItem(viewModel.currentIdx, false)
+                    Log.d(TAG_IMAGE, "current index = ${viewModel.currentIdx}")
+                    Toast.makeText(requireContext(), "Template deleted", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(requireContext(), "Could not delete the template", Toast.LENGTH_SHORT).show()
+                }
+
+                dialog.cancel()
             }
+
+            dialogView.findViewById<MaterialButton>(R.id.btnCancelDeleteTemplate).setOnClickListener {
+                dialog.cancel()
+            }
+
+            dialog.show()
+
+
         }
 
         binding.btnCreateTemplate.setOnClickListener {

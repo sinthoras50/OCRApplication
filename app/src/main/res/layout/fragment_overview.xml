@@ -106,7 +106,7 @@
                         android:minWidth="1dp"
                         android:minHeight="1dp"
                         android:translationZ="10dp"
-                        app:icon="@drawable/ic_baseline_clear_24"
+                        app:icon="@drawable/ic_baseline_delete_24"
                         app:iconGravity="textEnd"
                         app:iconPadding="0dp"
                         app:iconSize="40dp"
@@ -191,7 +191,23 @@
                     <androidx.viewpager2.widget.ViewPager2
                         android:id="@+id/viewPager"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                        android:layout_height="match_parent" >
+
+
+                    </androidx.viewpager2.widget.ViewPager2>
+
+                    <RelativeLayout
+                        android:id="@+id/overviewLoadingPanel"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:visibility="visible">
+
+                        <ProgressBar
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:indeterminate="true" />
+                    </RelativeLayout>
 
                     <!--                <ImageView-->
                     <!--                    android:id="@+id/overviewImageView"-->

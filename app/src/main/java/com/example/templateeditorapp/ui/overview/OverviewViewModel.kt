@@ -77,8 +77,10 @@ class OverviewViewModel(val database: ImageDatabase) : ViewModel() {
         return true
     }
 
-    fun deleteCurrentTemplate(): Boolean {
+    fun deleteCurrentTemplate(context: Context): Boolean {
         if (_currentImageName.value.isNullOrEmpty()) return false
+
+        ImageUtils.deletePhoto(_currentImageName.value!!, context)
 
         viewModelScope.launch {
             database.annotatedImageDao().deleteImage(_currentImageName.value!!)

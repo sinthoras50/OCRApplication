@@ -34,7 +34,7 @@ class CurrencySpinnerAdapter(val context: Context, val objects: List<Currency>) 
     }
 
     override fun getItem(p0: Int): Any {
-        return p0
+        return objects[p0].value
     }
 
     override fun getItemId(p0: Int): Long {

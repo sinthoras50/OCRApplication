@@ -19,6 +19,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.templateeditorapp.db.AnnotatedImage
 import com.example.templateeditorapp.db.ImageDatabase
 import com.example.templateeditorapp.utils.ImageUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
@@ -359,7 +362,8 @@ class EditorViewModel(val database: ImageDatabase) : ViewModel() {
     fun loadTemplate(filename: String, context: Context, spinner: Spinner) {
         viewModelScope.launch {
             val annotatedImage = database.annotatedImageDao().getImage(filename)
-            val bitmap = ImageUtils.loadPhoto(filename, context)
+            val deferredBitmap = async(Dispatchers.IO) { ImageUtils.loadPhoto(filename, context) }
+            val bitmap = deferredBitmap.await()
 
             if (annotatedImage == null || bitmap == null) return@launch
 

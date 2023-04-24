@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
@@ -132,13 +133,20 @@ object ImageUtils {
             put(MediaStore.Images.Media.HEIGHT, bitmap.height)
         }
         return try {
-            context.contentResolver.insert(imageCollection, contentValues)?.also { uri ->
+            val uri = context.contentResolver.insert(imageCollection, contentValues)?.also { uri ->
                 context.contentResolver.openOutputStream(uri).use { outputStream ->
                     if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 95, outputStream)) {
                         throw IOException("Couldn't save bitmap")
                     }
                 }
             } ?: throw IOException("Couldn't save bitmap")
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                contentValues.clear()
+                contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, "$filename.jpg")
+                context.contentResolver.update(uri, contentValues, null, null)
+            }
+
             true
         } catch(e: IOException) {
             e.printStackTrace()

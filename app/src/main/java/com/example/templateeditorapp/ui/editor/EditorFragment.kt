@@ -15,6 +15,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.view.*
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -210,11 +211,12 @@ class EditorFragment : Fragment() {
                     val args = Bundle()
                     args.putString(OVERVIEW_KEY, filename)
 
+                    Toast.makeText(requireContext(), "Template saved", Toast.LENGTH_SHORT).show()
                     findNavController().navigate(R.id.action_editorFragment_to_overviewFragment, args)
                 }
             }
 
-            dialogView.findViewById<MaterialButton>(R.id.btnCancelTemplate).setOnClickListener {
+            dialogView.findViewById<MaterialButton>(R.id.btnCancelSaveTemplate).setOnClickListener {
                 dialog.cancel()
             }
 

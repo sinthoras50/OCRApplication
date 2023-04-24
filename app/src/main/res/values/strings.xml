@@ -26,6 +26,24 @@
     <string name="edit_text_template_description">Edit text for template name</string>
     <string name="edit_text_template_hint">Template name</string>
     <string name="save_template_dialog_icon">Save template dialog icon</string>
+    <string name="qr_code_description">To complete your payment either scan this QR code with your banking app or open the %s</string>
+    <string name="currency_spinner_icon">Currency spinner icon</string>
+    <string name="currency_eur">EUR</string>
+    <string name="pay_by_square_title">Pay by Square</string>
+    <string name="payment_details_title">Payment Details</string>
+    <string name="recipient">Recipient</string>
+    <string name="iban">Iban</string>
+    <string name="amount">Amount</string>
+    <string name="variable_symbol">Variable symbol</string>
+    <string name="constant_symbol">Constant symbol</string>
+    <string name="specific_symbol">Specific symbol</string>
+    <string name="sender_s_note">Sender\'s note</string>
+    <string name="payment_reference">Payment reference</string>
+    <string name="confirm_transaction_btn">Confirm</string>
+    <string name="delete_template_dialog">Do you really want to delete this template?</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">delete</string>
+    <string name="testing_hyperlink">Testing placeholders %s %s</string>
     <string-array name="formFields">
         <item>beneficiary name</item>
         <item>iban</item>

@@ -99,6 +99,7 @@ class TesseractFragment : Fragment() {
 
             val args = Bundle()
             val currency = binding.amountCurrencySpinner.selectedItem.toString()
+            Log.d(TAG_IMAGE, "currency = $currency")
             args.putSerializable(OCR_MAP_KEY, viewModel.prepareResultMap(currency))
 
             findNavController().navigate(R.id.action_tesseractFragment_to_qrGeneratorFragment, args)

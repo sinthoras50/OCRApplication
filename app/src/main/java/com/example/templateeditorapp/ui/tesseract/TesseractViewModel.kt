@@ -16,6 +16,7 @@ import com.example.templateeditorapp.utils.TAG_IMAGE
 import com.googlecode.tesseract.android.TessBaseAPI
 import com.googlecode.tesseract.android.TessBaseAPI.ProgressValues
 import kotlinx.coroutines.*
+import java.math.BigInteger
 import java.util.*
 
 class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
@@ -28,18 +29,19 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
 
     private val _progress = MutableLiveData<Int>()
     private val _partialProgress = MutableLiveData<Int>()
-    private val _reqFieldsValid = MutableLiveData<BooleanArray>(booleanArrayOf(
-        false, // recipient
-        false, // iban
-        false, // amount
-        false, // vs
-        false, // cs
-        false, // ss
-    ))
+    private val _reqFieldsValid = MutableLiveData<BooleanArray>(
+        booleanArrayOf(
+            false, // recipient
+            false, // iban
+            false, // amount
+            false, // vs
+            false, // cs
+            false, // ss
+        )
+    )
 
     private val colorPurple = Color.parseColor("#6200EE")
     private val colorRed = Color.RED
-
 
 
     // these fields can be modified by user so should be public in order to work with data binding
@@ -106,14 +108,14 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
 
     private val ibanObserver = Observer<String?> {
         _ibanLength.value = "${iban.value?.length ?: '0'}"
-        _ibanColor.value = if (_ibanLength.value!!.toInt() > 34) colorRed else colorPurple
+        _ibanColor.value = if (_ibanLength.value!!.toInt() > 24) colorRed else colorPurple
         val value = isIbanValid(iban.value ?: "")
         _ibanValid.value = value
         updateReqArray(value, 1)
     }
 
     private val amountObserver = Observer<String?> {
-        val num = amount.value?.replace(",+".toRegex(), ".") ?: ""
+        val num = amount.value?.trim()?.replace(",+".toRegex(), ".") ?: ""
         val isDouble = isDouble(num)
         _amountValid.value = isDouble
         val value = (amount.value?.trim() ?: "").isNotEmpty() && isDouble
@@ -144,12 +146,16 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
     }
 
     private val reqFieldsObserver = Observer<BooleanArray?> {
-        _btnConfirmEnabled.value =  it.all { it2 -> it2 }
+        _btnConfirmEnabled.value = it.all { it2 -> it2 }
     }
 
     init {
         tessApi =
-            TessBaseAPI { progressValues: ProgressValues -> _partialProgress.postValue(progressValues.percent) }
+            TessBaseAPI { progressValues: ProgressValues ->
+                _partialProgress.postValue(
+                    progressValues.percent
+                )
+            }
 
         recipientName.observeForever(recipientObserver)
         iban.observeForever(ibanObserver)
@@ -162,8 +168,9 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
     }
 
     fun prepareResultMap(currency: String): HashMap<String, String?> {
+        val amount = amount.value?.replace(",", ".")
         return hashMapOf(
-            "amount" to amount.value,
+            "amount" to amount,
             "currency" to currency,
             "iban" to iban.value,
             "beneficiary name" to recipientName.value,
@@ -183,7 +190,23 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
     }
 
     private fun isIbanValid(iban: String): Boolean {
-        return true
+        if (iban.length != 24) return false
+
+        val shift = 55
+        val country = iban.substring(0, 2).uppercase()
+
+        // TODO make list of valid countries an external file
+        if (!listOf("SK", "CZ").contains(country)) return false
+
+        val checksum = iban.substring(2, 4).toIntOrNull() ?: return false
+
+        val countryNums = country.map { (it.code - shift).toString() }
+        val countryCode = countryNums.joinToString(separator="")
+
+        val bban = iban.substring(4) + countryCode + "00"
+        val num = (bban.toBigIntegerOrNull() ?: return false) % BigInteger("97")
+
+        return checksum == 98 - num.toInt()
     }
 
     private fun isLong(string: String): Boolean {
@@ -226,7 +249,13 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
         }
     }
 
-    fun recognizeImage(imagePath: String, templatePath: String, scalingFactor: Double, context: Context, cropRect: Rect? = null) {
+    fun recognizeImage(
+        imagePath: String,
+        templatePath: String,
+        scalingFactor: Double,
+        context: Context,
+        cropRect: Rect? = null
+    ) {
         if (!tessInit) {
             Log.e(TAG, "recognizeImage: Tesseract is not initialized")
             return
@@ -301,7 +330,7 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
         // remove whitespace
         val res = value.replace("\\s+".toRegex(), "")
 
-        when(key) {
+        when (key) {
             "amount" -> {
                 val replaceOs = res.replace("[oO]".toRegex(), "0")
                 val onlyDigits = replaceOs.filter { it.isDigit() }

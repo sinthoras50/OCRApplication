@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.templateeditorapp.utils.ImageUtils
 import com.example.templateeditorapp.utils.TAG_IMAGE
 import net.glxn.qrgen.android.QRCode
 import org.tukaani.xz.LZMA2Options
@@ -18,19 +19,43 @@ import java.util.zip.CRC32
 
 class QrGeneratorViewModel : ViewModel() {
 
+    private lateinit var transaction: Transaction
+
     private val _bitmap: MutableLiveData<Bitmap> = MutableLiveData()
+    private val _paymentLink = MutableLiveData<String>("")
 
     val bitmap: LiveData<Bitmap> = _bitmap
+    val paymentLink: LiveData<String> = _paymentLink
 
     fun generateQrCode(map: Map<String, String>, context: Context) {
         val transaction = createTransaction(map)
-        val delimitedString = transaction.getFormattedData()
-        Log.d(TAG_IMAGE, delimitedString)
-        Log.d(TAG_IMAGE, "formattedDate = ${transaction.date} date = ${transaction.currentDate}")
-        val encodedString = compress("placeholder")
+        this.transaction = transaction
+
+
+//        val delimitedString = transaction.getFormattedData()
+//        Log.d(TAG_IMAGE, delimitedString)
+//        Log.d(TAG_IMAGE, "formattedDate = ${transaction.date} date = ${transaction.currentDate}")
+//        val encodedString = compress(delimitedString)
+        val encodedString = transaction.getCompressedData()
         val width = context.resources.displayMetrics.widthPixels
         val bitmap = QRCode.from(encodedString).withSize(width, width).bitmap()
+
+        Log.d(TAG_IMAGE, transaction.getPaymentLink())
+
+        _paymentLink.value = transaction.getPaymentLink()
         _bitmap.value = bitmap
+    }
+
+    fun saveBitmap(context: Context): Boolean {
+        if (_bitmap.value == null) return false
+
+        val filename = createFileName()
+
+        return ImageUtils.savePhotoToExternalStorage(filename, _bitmap.value!!, context)
+    }
+
+    private fun createFileName(): String {
+        return "testing"
     }
 
     private fun createTransaction(map: Map<String, String>): Transaction {
