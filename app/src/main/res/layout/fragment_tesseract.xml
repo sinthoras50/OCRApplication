@@ -164,7 +164,7 @@
                         android:outlineProvider="none"
                         android:paddingStart="5dp"
                         android:paddingEnd="5dp"
-                        android:text="@{viewModel.ibanLength + `/24`}"
+                        android:text="@{viewModel.ibanLength}"
                         android:textColor="@{viewModel.ibanColor}"
                         android:textSize="15sp"
                         app:layout_constraintEnd_toEndOf="@+id/ibanEditText"

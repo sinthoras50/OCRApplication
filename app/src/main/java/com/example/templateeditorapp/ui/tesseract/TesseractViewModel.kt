@@ -15,11 +15,10 @@ import com.example.templateeditorapp.ui.qrgen.QrGeneratorFragment
 import com.example.templateeditorapp.ui.qrgen.Transaction
 import com.example.templateeditorapp.utils.ImageUtils
 import com.example.templateeditorapp.utils.TAG_IMAGE
-import com.example.templateeditorapp.utils.TransactionValidationUtils
+import com.example.templateeditorapp.utils.TransactionUtils
 import com.googlecode.tesseract.android.TessBaseAPI
 import com.googlecode.tesseract.android.TessBaseAPI.ProgressValues
 import kotlinx.coroutines.*
-import java.math.BigInteger
 import java.util.*
 
 /**
@@ -114,11 +113,13 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
     }
 
     private val ibanObserver = Observer<String?> {
-        _ibanLength.value = "${iban.value?.length ?: '0'}"
-        val ibanCountry = TransactionValidationUtils.getIbanCountry(iban.value ?: "")
-        val ibanLength = TransactionValidationUtils.getIbanLength(ibanCountry)
-        _ibanColor.value = if (_ibanLength.value!!.toInt() != ibanLength) colorRed else colorPurple
-        val value = TransactionValidationUtils.isValidIban(iban.value ?: "")
+        val ibanCountry = TransactionUtils.getIbanCountry(iban.value ?: "")
+        val ibanLength = TransactionUtils.getIbanLength(ibanCountry)
+        val length = iban.value?.length ?: 0
+        _ibanLength.value = "$length/$ibanLength"
+
+        _ibanColor.value = if (length != ibanLength) colorRed else colorPurple
+        val value = TransactionUtils.isValidIban(iban.value ?: "")
         _ibanValid.value = value
         updateReqArray(value, 1)
     }
@@ -126,15 +127,16 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
     private val amountObserver = Observer<String?> {
         val num = amount.value?.trim()?.replace(",+".toRegex(), ".") ?: ""
         val isDouble = isDouble(num)
-        _amountValid.value = isDouble
+        val isValid = TransactionUtils.isValidAmount(num)
+        _amountValid.value = isValid
         val value = (amount.value?.trim() ?: "").isNotEmpty() && isDouble
-        updateReqArray(value, 2)
+        updateReqArray(isValid, 2)
     }
     private val variableSymbolObserver = Observer<String?> {
         _vsLength.value = "${variableSymbol.value?.length ?: '0'}"
         _vsColor.value = if (_vsLength.value!!.toInt() > 10) colorRed else colorPurple
         val num = variableSymbol.value ?: "0"
-        _vsValid.value = isLong(num)
+        _vsValid.value = TransactionUtils.isNumeric(num)
         updateReqArray(_vsValid.value!! && num.length <= 10, 3)
     }
 
@@ -142,7 +144,7 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
         _csLength.value = "${constantSymbol.value?.length ?: '0'}"
         _csColor.value = if (_csLength.value!!.toInt() > 4) colorRed else colorPurple
         val num = constantSymbol.value ?: "0"
-        _csValid.value = isLong(num)
+        _csValid.value = TransactionUtils.isNumeric(num)
         updateReqArray(_csValid.value!! && num.length <= 4, 4)
     }
 
@@ -150,7 +152,7 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
         _ssLength.value = "${specificSymbol.value?.length ?: '0'}"
         _ssColor.value = if (_ssLength.value!!.toInt() > 10) colorRed else colorPurple
         val num = specificSymbol.value ?: "0"
-        _ssValid.value = isLong(num)
+        _ssValid.value = TransactionUtils.isNumeric(num)
         updateReqArray(_ssValid.value!! && num.length <= 10, 5)
     }
 
@@ -362,11 +364,8 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
             "specific symbol" -> specificSymbol.postValue(res)
             "note" -> note.postValue(res)
             "iban" -> {
-                val replaceOs = res.replace("[oO]".toRegex(), "0")
-                val removeDisallowed = replaceOs
-                    .filter { it.isLetterOrDigit() }
-                    .uppercase()
-                iban.postValue(removeDisallowed)
+                val fixedIban = TransactionUtils.fixIban(res)
+                iban.postValue(fixedIban)
             }
             "swift" -> swift.postValue(res)
             "beneficiary name" -> recipientName.postValue(value)

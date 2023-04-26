@@ -5,222 +5,349 @@
   {
     "country": "DEFAULT",
     "code": "DEFAULT",
-    "length": 34
+    "length": 34,
+    "bank_codes": []
   },
 
   {
     "country": "Andorra",
     "code": "AD",
-    "length": 24
+    "length": 24,
+    "bank_codes": []
   },
 
   {
     "country": "Austria",
     "code": "AT",
-    "length": 24
+    "length": 24,
+    "bank_codes": []
   },
 
   {
     "country": "Belgium",
     "code": "BE",
-    "length": 16
+    "length": 16,
+    "bank_codes": []
   },
 
   {
     "country": "Bulgaria",
     "code": "BG",
-    "length": 22
+    "length": 22,
+    "bank_codes": []
   },
 
   {
     "country": "Croatia",
     "code": "HR",
-    "length": 21
+    "length": 21,
+    "bank_codes": []
   },
 
   {
     "country": "Cyprus",
     "code": "CY",
-    "length": 28
+    "length": 28,
+    "bank_codes": []
   },
 
   {
     "country": "Czech Republic",
     "code": "CZ",
-    "length": 24
+    "length": 24,
+    "bank_codes": [
+      "3030",
+      "2220",
+      "8231",
+      "8250",
+      "2020",
+      "2250",
+      "6300",
+      "8090",
+      "0710",
+      "0800",
+      "7960",
+      "0300",
+      "2030",
+      "2060",
+      "2600",
+      "6200",
+      "5000",
+      "0300",
+      "7960",
+      "7910",
+      "6100",
+      "2210",
+      "4000",
+      "4141",
+      "2010",
+      "3050",
+      "8150",
+      "2100",
+      "5051",
+      "8265",
+      "3500",
+      "5800",
+      "0100",
+      "4000",
+      "6210",
+      "7990",
+      "0600",
+      "7970",
+      "4300",
+      "2260",
+      "8040",
+      "2200",
+      "3060",
+      "6000",
+      "7950",
+      "5500",
+      "8211",
+      "6800",
+      "8060",
+      "2070",
+      "2700",
+      "8221",
+      "8030",
+      "6700",
+      "7940",
+      "3040",
+      "7970",
+      "7980",
+      "2310"
+    ]
   },
 
   {
     "country": "Denmark",
     "code": "DK",
-    "length": 18
+    "length": 18,
+    "bank_codes": []
   },
 
   {
     "country": "Estonia",
     "code": "EE",
-    "length": 20
+    "length": 20,
+    "bank_codes": []
   },
 
   {
     "country": "Finland",
     "code": "FI",
-    "length": 18
+    "length": 18,
+    "bank_codes": []
   },
 
   {
     "country": "France",
     "code": "FR",
-    "length": 27
+    "length": 27,
+    "bank_codes": []
   },
 
   {
     "country": "Germany",
     "code": "DE",
-    "length": 22
+    "length": 22,
+    "bank_codes": []
   },
 
   {
     "country": "Gibraltar",
     "code": "GI",
-    "length": 23
+    "length": 23,
+    "bank_codes": []
   },
 
   {
     "country": "Greece",
     "code": "GR",
-    "length": 27
+    "length": 27,
+    "bank_codes": []
   },
 
   {
     "country": "Holy See(the)",
     "code": "VA",
-    "length": 22
+    "length": 22,
+    "bank_codes": []
   },
 
   {
     "country": "Hungary",
     "code": "HU",
-    "length": 28
+    "length": 28,
+    "bank_codes": []
   },
 
   {
     "country": "Iceland",
     "code": "IS",
-    "length": 26
+    "length": 26,
+    "bank_codes": []
   },
 
   {
     "country": "Italy",
     "code": "IT",
-    "length": 27
+    "length": 27,
+    "bank_codes": []
   },
 
   {
     "country": "Latvia",
     "code": "LV",
-    "length": 21
+    "length": 21,
+    "bank_codes": []
   },
 
   {
     "country": "Liechtenstein",
     "code": "LI",
-    "length": 21
+    "length": 21,
+    "bank_codes": []
   },
 
   {
     "country": "Lithuania",
     "code": "LT",
-    "length": 21
+    "length": 21,
+    "bank_codes": []
   },
 
   {
     "country": "Luxemburg",
     "code": "LU",
-    "length": 20
+    "length": 20,
+    "bank_codes": []
   },
 
   {
     "country": "Malta",
     "code": "MT",
-    "length": 31
+    "length": 31,
+    "bank_codes": []
   },
 
   {
     "country": "Monaco",
     "code": "MC",
-    "length": 27
+    "length": 27,
+    "bank_codes": []
   },
 
   {
     "country": "Netherlands",
     "code": "NL",
-    "length": 18
+    "length": 18,
+    "bank_codes": []
   },
 
   {
     "country": "Norway",
     "code": "NO",
-    "length": 15
+    "length": 15,
+    "bank_codes": []
   },
 
   {
     "country": "Poland",
     "code": "PO",
-    "length": 28
+    "length": 28,
+    "bank_codes": []
   },
 
   {
     "country": "Portugal",
     "code": "PT",
-    "length": 25
+    "length": 25,
+    "bank_codes": []
   },
 
   {
     "country": "Romania",
     "code": "RO",
-    "length": 24
+    "length": 24,
+    "bank_codes": []
   },
 
   {
     "country": "San Marino",
     "code": "SM",
-    "length": 27
+    "length": 27,
+    "bank_codes": []
   },
 
   {
     "country": "Slovakia",
     "code": "SK",
-    "length": 24
+    "length": 24,
+    "bank_codes": [
+      "0900",
+      "0200",
+      "5600",
+      "7500",
+      "6500",
+      "7500",
+      "8170",
+      "1100",
+      "6500",
+      "8120",
+      "1100",
+      "8360",
+      "8330",
+      "8320",
+      "8100",
+      "8370",
+      "1111",
+      "3000",
+      "8160",
+      "0720",
+      "8180",
+      "7930",
+      "8900",
+      "8420",
+      "8130",
+      "8050",
+      "7300",
+      "8430",
+      "8400"
+    ]
   },
 
   {
     "country": "Slovenia",
     "code": "SI",
-    "length": 19
+    "length": 19,
+    "bank_codes": []
   },
 
   {
     "country": "Spain",
     "code": "ES",
-    "length": 24
+    "length": 24,
+    "bank_codes": []
   },
 
   {
     "country": "Sweden",
     "code": "SE",
-    "length": 24
+    "length": 24,
+    "bank_codes": []
   },
 
   {
     "country": "Switzerland",
     "code": "CH",
-    "length": 21
+    "length": 21,
+    "bank_codes": []
   },
 
   {
     "country": "United Kingdom",
     "code": "GB",
-    "length": 22
+    "length": 22,
+    "bank_codes": []
   }
 ]

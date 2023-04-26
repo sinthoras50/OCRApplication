@@ -52,8 +52,8 @@ class TesseractFragment : Fragment() {
 
 //         extract assets into the device's memory
         Assets.extractAsset(requireContext(), "$language.traineddata", "tessdata")
-        Assets.extractAsset(requireContext(), "countries.json", "countriesdata")
-        TransactionValidationUtils.initCountries(requireContext())
+        Assets.extractAsset(requireContext(), "countries.json", "countriesdata", true)
+        TransactionUtils.initCountries(requireContext())
 
         viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
