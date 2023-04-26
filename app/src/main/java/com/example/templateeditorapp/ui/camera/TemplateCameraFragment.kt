@@ -20,6 +20,7 @@ import com.example.templateeditorapp.OcrApp
 import com.example.templateeditorapp.R
 import com.example.templateeditorapp.databinding.FragmentCameraBinding
 import com.example.templateeditorapp.db.ImageDatabase
+import com.example.templateeditorapp.ui.editor.EditorFragment
 import com.example.templateeditorapp.ui.opencv.*
 import com.example.templateeditorapp.utils.ImageUtils
 import com.example.templateeditorapp.utils.TAG_IMAGE
@@ -35,6 +36,11 @@ import org.opencv.core.CvType
 import org.opencv.core.Mat
 import java.lang.IllegalArgumentException
 
+
+/**
+ * A [Fragment] subclass that handles the camera functionality and takes pictures.
+ * Implements [CameraBridgeViewBase.CvCameraViewListener2] and [PictureTakenListener] interfaces.
+ */
 class TemplateCameraFragment : Fragment(), CameraBridgeViewBase.CvCameraViewListener2, PictureTakenListener {
 
     companion object {
@@ -51,6 +57,13 @@ class TemplateCameraFragment : Fragment(), CameraBridgeViewBase.CvCameraViewList
     private lateinit var mRGBAT: Mat
     private lateinit var mRotatedFrame: Mat
 
+
+    /**
+     * Called when the fragment is being created.
+     * Initializes [viewModel] and [baseLoaderCallback] variables.
+     *
+     * @param savedInstanceState The saved instance state bundle.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this).get(TemplateCameraViewModel::class.java)
@@ -72,6 +85,17 @@ class TemplateCameraFragment : Fragment(), CameraBridgeViewBase.CvCameraViewList
         }
     }
 
+
+    /**
+     * Called when the fragment view is being created.
+     * Initializes [binding], [cameraBridgeViewBase], and [requestPermissionsLauncher] variables.
+     * Also requests camera permission if it is not granted.
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate views in the fragment.
+     * @param container The parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState The saved instance state bundle.
+     * @return The root view of the fragment.
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -98,10 +122,16 @@ class TemplateCameraFragment : Fragment(), CameraBridgeViewBase.CvCameraViewList
         return binding.root
     }
 
+
+    /**
+     * Called when the view hierarchy is created and the fragment view is bound to it.
+     * Initializes UI components, handles UI events, and sets observers for [viewModel] properties.
+     *
+     * @param view The fragment's root view.
+     * @param savedInstanceState The saved instance state bundle.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
 
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
@@ -161,6 +191,9 @@ class TemplateCameraFragment : Fragment(), CameraBridgeViewBase.CvCameraViewList
 
     }
 
+    /**
+     * Called when the fragment is resumed.
+     */
     override fun onResume() {
         super.onResume()
 
@@ -173,35 +206,54 @@ class TemplateCameraFragment : Fragment(), CameraBridgeViewBase.CvCameraViewList
         }
     }
 
+
+    /**
+     * Called when the camera view is started.
+     * @param width the width of the camera view.
+     * @param height the height of the camera view.
+     */
     override fun onCameraViewStarted(width: Int, height: Int) {
         mRGBA = Mat(height, width, CvType.CV_8UC4)
         mRGBAT = Mat(height, width, CvType.CV_8UC1)
         mRotatedFrame = Mat(width, height, CvType.CV_8UC4)
     }
 
+    /**
+     * Called when the camera view is stopped.
+     * Releases the memory allocated to the Mats.
+     */
     override fun onCameraViewStopped() {
         mRGBA.release()
         mRGBAT.release()
         mRotatedFrame.release()
     }
 
+    /**
+     * Called when a camera frame is captured.
+     * Rotates the frame 90 degrees clockwise and returns a new Mat with a grid overlay.
+     * @param inputFrame the current camera frame.
+     * @return the processed frame with grid overlay.
+     */
     override fun onCameraFrame(inputFrame: CameraBridgeViewBase.CvCameraViewFrame?): Mat {
         if (inputFrame != null) {
             mRGBA = inputFrame.rgba()
 
             Core.rotate(mRGBA, mRotatedFrame, Core.ROTATE_90_CLOCKWISE)
-//            viewModel.drawGrid(mRotatedFrame)
             Log.d(TAG_IMAGE, "width = ${mRotatedFrame.width()} height = ${mRotatedFrame.height()}")
         }
 
         return viewModel.drawGrid(mRotatedFrame, 2)
     }
 
+
+    /**
+     * Called when a picture is taken.
+     * Navigates to the [EditorFragment] with the temporary photo path as an argument.
+     */
     override fun onPictureTaken() {
         binding.loadingPanel.visibility = View.GONE
         val args = Bundle()
         args.putString(TEMP_PHOTO_KEY, TEMP_PHOTO_PATH)
         findNavController().navigate(R.id.action_templateCameraFragment_to_editorFragment, args)
     }
-
 }

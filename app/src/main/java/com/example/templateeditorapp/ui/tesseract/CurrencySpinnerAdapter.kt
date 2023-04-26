@@ -13,6 +13,9 @@ import android.widget.TextView
 import com.example.templateeditorapp.R
 import com.example.templateeditorapp.ui.qrgen.Currency
 
+/**
+ * A custom [BaseAdapter] class used for populating a spinner with values from a list of [Currency] items.
+ */
 class CurrencySpinnerAdapter(val context: Context, val objects: List<Currency>) : BaseAdapter() {
 
     @SuppressLint("ViewHolder")
@@ -29,14 +32,28 @@ class CurrencySpinnerAdapter(val context: Context, val objects: List<Currency>) 
         return view
     }
 
+    /**
+     * Returns the number of items in the spinner.
+     * @return Returns the size of the [objects] list
+     */
     override fun getCount(): Int {
         return objects.size
     }
 
+    /**
+     * Returns the specified item.
+     * @param p0 Position
+     * @return Returns the [Currency] item at position [p0]
+     */
     override fun getItem(p0: Int): Any {
         return objects[p0].value
     }
 
+    /**
+     * Returns the id of the item
+     * @param p0 Position
+     * @return Returns the id of the item at position [p0]
+     */
     override fun getItemId(p0: Int): Long {
         return p0.toLong()
     }

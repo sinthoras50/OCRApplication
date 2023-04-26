@@ -36,6 +36,9 @@ import com.google.android.material.button.MaterialButton
 const val PICK_IMAGE = 1
 const val DEBUG = "DEBUG"
 
+/**
+ * A [Fragment] subclass that helps the user create new Cheque/Invoice templates.
+ */
 class EditorFragment : Fragment() {
 
     private val minImageScale = 1.0f
@@ -54,6 +57,14 @@ class EditorFragment : Fragment() {
     private lateinit var binding: FragmentEditorBinding
     private lateinit var requestPermissionsLauncher: ActivityResultLauncher<String>
 
+
+    /**
+     * Called when the activity is starting or restarting.
+     * Initializes the [viewModel] by creating a [ViewModelProvider] and passing a [ViewModelProvider.Factory]
+     * that creates an instance of [EditorViewModel] class using the [db] database.
+     * Registers an activity result callback to request permission to access the device's image gallery.
+     * @param savedInstanceState a Bundle object containing previously saved state.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
@@ -85,6 +96,16 @@ class EditorFragment : Fragment() {
         return binding.root
     }
 
+
+    /**
+     * Called when the view hierarchy associated with this fragment is created.
+     * Sets up the image attacher, initializes the dropdown, and loads a template if it exists.
+     * If an image result from the gallery exists, the result is handled, and the spinner items are updated.
+     * Observes the [EditorViewModel.imageData] and updates the [MyPhotoView] accordingly.
+     *
+     * @param view The root view of the fragment.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state as given here.
+     */
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -225,6 +246,9 @@ class EditorFragment : Fragment() {
 
     }
 
+    /**
+     * Initializes the [EditorSpinnerAdapter] dropdown menu.
+     */
     private fun initializeDropdown() {
         val spinner = binding.spinnerFormFields
         val items = listOf(*resources.getStringArray(R.array.formFields))
@@ -235,12 +259,24 @@ class EditorFragment : Fragment() {
     }
 
 
+    /**
+     * Starts an intent to pick an image from the gallery.
+     */
     private fun pickImage() {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.type = "image/*"
         startActivityForResult(intent, PICK_IMAGE)
     }
 
+
+    /**
+     * Handles the result of the activity started by startActivityForResult().
+     * If the request code is PICK_IMAGE and the result code is RESULT_OK, calls the
+     * [EditorViewModel.handleImageResult] function to handle the image result and update the spinner items.
+     * @param requestCode The request code passed to startActivityForResult().
+     * @param resultCode The result code returned from the activity.
+     * @param data The intent returned from the activity.
+     */
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 

@@ -19,6 +19,10 @@ import java.math.BigInteger
 import kotlin.math.abs
 import kotlin.math.min
 
+/**
+ * ViewModel class that manages the camera functionality of the [TemplateCameraFragment].
+ * Provides methods to take pictures, change focus mode and flash mode, and draw a grid over an OpenCV Mat object.
+ */
 class TemplateCameraViewModel : ViewModel() {
 
     private val _focusMode = MutableLiveData<String>(FocusMode.FIXED.value)
@@ -27,6 +31,11 @@ class TemplateCameraViewModel : ViewModel() {
     val focusMode: LiveData<String> = _focusMode
     val flashMode: LiveData<String> = _flashMode
 
+    /**
+     * Takes a picture using the camera specified by the given [CameraBridgeViewBase].
+     * @param filename The name of the file to save the picture to.
+     * @param bridgeViewBase The CameraBridgeViewBase object representing the camera.
+     */
     fun takePicture(filename: String, bridgeViewBase: CameraBridgeViewBase) {
         val camera = bridgeViewBase as MyCameraView
         camera.setFlash(_flashMode.value!!)
@@ -34,6 +43,9 @@ class TemplateCameraViewModel : ViewModel() {
         camera.takePicture(filename)
     }
 
+    /**
+     * Toggles the flash mode between ON, AUTO, and OFF.
+     */
     fun onClickFlash() {
         when(_flashMode.value) {
             FlashMode.ON.value -> _flashMode.value = FlashMode.AUTO.value
@@ -42,6 +54,9 @@ class TemplateCameraViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Toggles the focus mode between FIXED and AUTO.
+     */
     fun onClickFocus() {
         when(_focusMode.value) {
             FocusMode.FIXED.value -> _focusMode.value = FocusMode.AUTO.value
@@ -49,6 +64,12 @@ class TemplateCameraViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Draws a grid over the given OpenCV [Mat] object.
+     * @param mat The Mat object to draw the grid on.
+     * @param thickness The thickness of the lines of the grid.
+     * @return The modified Mat object.
+     */
     fun drawGrid(mat: Mat, thickness: Int): Mat {
         val gcd = BigInteger.valueOf(mat.width().toLong())
             .gcd(BigInteger.valueOf(mat.height().toLong()))

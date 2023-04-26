@@ -19,29 +19,67 @@ import org.opencv.android.JavaCameraView
 import java.io.FileOutputStream
 import java.io.IOException
 
+
+/**
+ * A custom camera view that extends the JavaCameraView class and adds additional functionality
+ * for taking pictures, setting flash and focus modes, and providing callbacks for when a picture is taken.
+ *
+ * @param context The context used for creating the camera view.
+ * @param attrs The attribute set used for configuring the camera view.
+ */
 class MyCameraView(context: Context?, attrs: AttributeSet?) : JavaCameraView(context, attrs) {
 
     private val TAG = "myCameraView"
 
+    /**
+     * The listener to be called when a picture is taken.
+     */
     private lateinit var pictureTakenListener: PictureTakenListener
+
+    /**
+     * The file name to be used when saving the picture.
+     */
     private var mPictureFileName: String? = null
 
+
+    /**
+     * Sets the listener to be called when a picture is taken.
+     *
+     * @param listener The listener to be called.
+     */
     fun setOnPictureTakenListener(listener: PictureTakenListener) {
         pictureTakenListener = listener
     }
 
+
+    /**
+     * Sets the flash mode of the camera.
+     *
+     * @param mode The flash mode to be set.
+     */
     fun setFlash(mode: String) {
         val params = mCamera.parameters
         params.flashMode = mode
         mCamera.parameters = params
     }
 
+
+    /**
+     * Sets the focus mode of the camera.
+     *
+     * @param mode The focus mode to be set.
+     */
     fun setFocus(mode: String) {
         val params = mCamera.parameters
         params.focusMode = mode
         mCamera.parameters = params
     }
 
+    /**
+     * Takes a picture and saves it to the device.
+     *
+     * @param fileName The name to be used when saving the picture.
+     */
     fun takePicture(fileName: String?) {
         Log.i(TAG, "Taking picture")
         mPictureFileName = fileName

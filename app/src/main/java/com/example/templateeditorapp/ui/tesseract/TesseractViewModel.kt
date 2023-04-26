@@ -11,17 +11,24 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.Observer
 import com.example.templateeditorapp.db.ImageDatabase
 import com.example.templateeditorapp.ui.editor.BoundingBox
+import com.example.templateeditorapp.ui.qrgen.QrGeneratorFragment
+import com.example.templateeditorapp.ui.qrgen.Transaction
 import com.example.templateeditorapp.utils.ImageUtils
 import com.example.templateeditorapp.utils.TAG_IMAGE
+import com.example.templateeditorapp.utils.TransactionValidationUtils
 import com.googlecode.tesseract.android.TessBaseAPI
 import com.googlecode.tesseract.android.TessBaseAPI.ProgressValues
 import kotlinx.coroutines.*
 import java.math.BigInteger
 import java.util.*
 
+/**
+ * [ViewModel] class for controlling the Tesseract OCR functionality and user input validation of the [Transaction] data
+ * @param database [ImageDatabase] containing the annotated images
+ */
 class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
-    private val TAG = "MainViewModel"
 
+    private val TAG = "MainViewModel"
     private var tessApi: TessBaseAPI
     private var tessInit = false
     private var stopped = false
@@ -44,7 +51,7 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
     private val colorRed = Color.RED
 
 
-    // these fields can be modified by user so should be public in order to work with data binding
+    // these fields can be modified by the user so they should be public in order to work with two way data binding
     val amount = MutableLiveData<String>("")
     val recipientName = MutableLiveData<String>("")
     val variableSymbol = MutableLiveData<String>("")
@@ -108,8 +115,10 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
 
     private val ibanObserver = Observer<String?> {
         _ibanLength.value = "${iban.value?.length ?: '0'}"
-        _ibanColor.value = if (_ibanLength.value!!.toInt() > 24) colorRed else colorPurple
-        val value = isIbanValid(iban.value ?: "")
+        val ibanCountry = TransactionValidationUtils.getIbanCountry(iban.value ?: "")
+        val ibanLength = TransactionValidationUtils.getIbanLength(ibanCountry)
+        _ibanColor.value = if (_ibanLength.value!!.toInt() != ibanLength) colorRed else colorPurple
+        val value = TransactionValidationUtils.isValidIban(iban.value ?: "")
         _ibanValid.value = value
         updateReqArray(value, 1)
     }
@@ -167,6 +176,10 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
 
     }
 
+    /**
+     * Prepares a [HashMap] which will be used to send data to the [QrGeneratorFragment].
+     * @param currency Currency string is the only param not controlled by [LiveData], thus needs to be specified here
+     */
     fun prepareResultMap(currency: String): HashMap<String, String?> {
         val amount = amount.value?.replace(",", ".")
         return hashMapOf(
@@ -183,30 +196,14 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
         )
     }
 
+    /**
+     * Updates the requirement [LiveData] array with new value.
+     * @param position Position in the array to be updated with the new value
+     */
     private fun updateReqArray(value: Boolean, position: Int) {
-        val oldArray = _reqFieldsValid.value?.clone() ?: booleanArrayOf(false, false, false)
+        val oldArray = _reqFieldsValid.value?.clone() ?: booleanArrayOf(false, false, false, false, false, false)
         oldArray[position] = value
         _reqFieldsValid.value = oldArray
-    }
-
-    private fun isIbanValid(iban: String): Boolean {
-        if (iban.length != 24) return false
-
-        val shift = 55
-        val country = iban.substring(0, 2).uppercase()
-
-        // TODO make list of valid countries an external file
-        if (!listOf("SK", "CZ").contains(country)) return false
-
-        val checksum = iban.substring(2, 4).toIntOrNull() ?: return false
-
-        val countryNums = country.map { (it.code - shift).toString() }
-        val countryCode = countryNums.joinToString(separator="")
-
-        val bban = iban.substring(4) + countryCode + "00"
-        val num = (bban.toBigIntegerOrNull() ?: return false) % BigInteger("97")
-
-        return checksum == 98 - num.toInt()
     }
 
     private fun isLong(string: String): Boolean {
@@ -219,6 +216,10 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
         return input.toDoubleOrNull() != null
     }
 
+    /**
+     * This method will be called when this ViewModel is no longer used and will be destroyed. Stops the Tesseract API.
+     * Removes the [LiveData] observers to prevent memory leaks.
+     */
     override fun onCleared() {
         if (isProcessing()) {
             tessApi.stop()
@@ -235,6 +236,12 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
         _reqFieldsValid.removeObserver(reqFieldsObserver)
     }
 
+    /**
+     * Initializes Tesseract.
+     * @param dataPath Path to where Tesseract traineddata can be found
+     * @param language Language of the tesseract traineddata
+     * @param engineMode Specifies which engine mode Tesseract should use
+     */
     fun initTesseract(dataPath: String, language: String, engineMode: Int) {
         Log.i(
             TAG, "Initializing Tesseract with: dataPath = [" + dataPath + "], " +
@@ -249,6 +256,14 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
         }
     }
 
+    /**
+     * Function which extracts the data from the image and populates [LiveData] from it.
+     * @param imagePath Path of the image to be recognized
+     * @param templatePath Path of an image that serves as a template for [imagePath]. Template will be used to identify which parts of the image OCR should be used on
+     * @param scalingFactor A factor by which the roi rectangles should be multiplied
+     * @param context Context of the app
+     * @param cropRect Optional rectangle specifying the roi of the image
+     */
     fun recognizeImage(
         imagePath: String,
         templatePath: String,
@@ -326,6 +341,12 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
         }
     }
 
+    /**
+     * Updates [LiveData] with its corresponding value matched by key. This function receives data from the OCR method
+     * and performs error correction it, before assinging it to the LiveData.
+     * @param key A key which maps to the corresponding [LiveData] variable
+     * @param value The value which should be assigned
+     */
     private fun updateField(key: String, value: String) {
         // remove whitespace
         val res = value.replace("\\s+".toRegex(), "")
@@ -354,6 +375,9 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
         }
     }
 
+    /**
+     * Stops the Tesseract API.
+     */
     fun stop() {
         if (!isProcessing()) {
             return

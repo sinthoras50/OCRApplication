@@ -29,6 +29,9 @@ import com.example.templateeditorapp.utils.TAG_IMAGE
 import java.io.File
 import java.io.FileOutputStream
 
+/**
+ * A fragment for generating and displaying a QR code and a `payme.sk` hyperlink.
+ */
 class QrGeneratorFragment : Fragment() {
 
     companion object {
@@ -73,8 +76,6 @@ class QrGeneratorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-
         // application logic
 
         binding.qrCodeDescriptionTextView.movementMethod = LinkMovementMethod.getInstance()
@@ -99,35 +100,17 @@ class QrGeneratorFragment : Fragment() {
         }
 
         binding.btnShareQr.setOnClickListener {
-            val context = requireContext()
-            val imagePath = File(context.filesDir, "external_files")
-            imagePath.mkdir()
-            val imageFile = File(imagePath.path, "temp_qr.jpg")
-
-            val fos = FileOutputStream(imageFile)
-            viewModel.bitmap.value!!.compress(Bitmap.CompressFormat.JPEG, 95, fos)
-            fos.flush()
-            fos.close()
-
-            val uri = FileProvider.getUriForFile(context, "com.example.templateeditorapp", imageFile)
-
-            val intent = Intent(Intent.ACTION_SEND)
-            intent.type = "image/*"
-            intent.putExtra(Intent.EXTRA_STREAM, uri)
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-
-            startActivity(Intent.createChooser(intent, "Share QR code"))
+            shareQrCode()
         }
 
         binding.btnCopyUrl.setOnClickListener {
-            val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            val clip = ClipData.newPlainText("payme_link", viewModel.paymentLink.value)
-            clipboard.setPrimaryClip(clip)
-
-            Toast.makeText(requireContext(), "Payme link copied to clipboard", Toast.LENGTH_SHORT).show()
+            copyPaymeToClipboard()
         }
     }
 
+    /**
+     * Saves the QR code bitmap to external storage.
+     */
     private fun saveQrCodeToExternalStorage() {
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
@@ -142,6 +125,41 @@ class QrGeneratorFragment : Fragment() {
         } else {
             requestPermissionsLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
+    }
+
+    /**
+     * Shares the QR code bitmap using the system share sheet.
+     */
+    private fun shareQrCode() {
+        val context = requireContext()
+        val imagePath = File(context.filesDir, "external_files")
+        imagePath.mkdir()
+        val imageFile = File(imagePath.path, "temp_qr.jpg")
+
+        val fos = FileOutputStream(imageFile)
+        viewModel.bitmap.value!!.compress(Bitmap.CompressFormat.JPEG, 95, fos)
+        fos.flush()
+        fos.close()
+
+        val uri = FileProvider.getUriForFile(context, "com.example.templateeditorapp", imageFile)
+
+        val intent = Intent(Intent.ACTION_SEND)
+        intent.type = "image/*"
+        intent.putExtra(Intent.EXTRA_STREAM, uri)
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+        startActivity(Intent.createChooser(intent, "Share QR code"))
+    }
+
+    /**
+     * Copies the payme.sk hyperlink to the device's clipboard.
+     */
+    private fun copyPaymeToClipboard() {
+        val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText("payme_link", viewModel.paymentLink.value)
+        clipboard.setPrimaryClip(clip)
+
+        Toast.makeText(requireContext(), "Payme link copied to clipboard", Toast.LENGTH_SHORT).show()
     }
 
 }

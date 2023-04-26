@@ -17,6 +17,15 @@ import java.math.BigDecimal
 import java.nio.ByteOrder
 import java.util.zip.CRC32
 
+/**
+ * ViewModel for generating QR codes and payme.sk hyperlinks for transactions.
+ *
+ * @property transaction The current transaction being processed.
+ * @property _bitmap A [MutableLiveData] object containing the generated QR code as a [Bitmap].
+ * @property _paymentLink A [MutableLiveData] object containing the payment link associated with the current transaction.
+ * @property bitmap A [LiveData] object containing the generated QR code as a [Bitmap].
+ * @property paymentLink A [LiveData] object containing the payment link associated with the current transaction.
+ */
 class QrGeneratorViewModel : ViewModel() {
 
     private lateinit var transaction: Transaction
@@ -27,15 +36,17 @@ class QrGeneratorViewModel : ViewModel() {
     val bitmap: LiveData<Bitmap> = _bitmap
     val paymentLink: LiveData<String> = _paymentLink
 
+
+    /**
+     * Generates a QR code for the provided [map] of transaction data using the given [context].
+     *
+     * @param map A [Map] containing the transaction data.
+     * @param context The [Context] used to generate the QR code.
+     */
     fun generateQrCode(map: Map<String, String>, context: Context) {
         val transaction = createTransaction(map)
         this.transaction = transaction
 
-
-//        val delimitedString = transaction.getFormattedData()
-//        Log.d(TAG_IMAGE, delimitedString)
-//        Log.d(TAG_IMAGE, "formattedDate = ${transaction.date} date = ${transaction.currentDate}")
-//        val encodedString = compress(delimitedString)
         val encodedString = transaction.getCompressedData()
         val width = context.resources.displayMetrics.widthPixels
         val bitmap = QRCode.from(encodedString).withSize(width, width).bitmap()
@@ -46,6 +57,12 @@ class QrGeneratorViewModel : ViewModel() {
         _bitmap.value = bitmap
     }
 
+    /**
+     * Saves the generated QR code [Bitmap] to external storage using the provided [context].
+     *
+     * @param context The [Context] used to save the QR code [Bitmap] to external storage.
+     * @return True if the QR code [Bitmap] was successfully saved, false otherwise.
+     */
     fun saveBitmap(context: Context): Boolean {
         if (_bitmap.value == null) return false
 
@@ -54,10 +71,21 @@ class QrGeneratorViewModel : ViewModel() {
         return ImageUtils.savePhotoToExternalStorage(filename, _bitmap.value!!, context)
     }
 
+    /**
+     * Generates a filename for the saved QR code [Bitmap].
+     *
+     * @return A [String] representing the filename for the saved QR code [Bitmap].
+     */
     private fun createFileName(): String {
         return "testing"
     }
 
+    /**
+     * Creates a new [Transaction] object using the provided [map] of transaction data.
+     *
+     * @param map A [Map] containing the transaction data.
+     * @return A new [Transaction] object initialized with the provided transaction data.
+     */
     private fun createTransaction(map: Map<String, String>): Transaction {
         return Transaction(
             amount = BigDecimal(map["amount"]),
@@ -72,88 +100,4 @@ class QrGeneratorViewModel : ViewModel() {
             beneficiaryAddress2 = map["beneficiary address 2"] ?: ""
         )
     }
-
-    private fun Long.toByteArray(bytes: Int = 4, endianness: ByteOrder = ByteOrder.BIG_ENDIAN): ByteArray {
-        val result = ByteArray(bytes)
-        for (i in 0 until bytes) {
-            result[i] = this.ushr(i * 8).toByte()
-        }
-
-        return if (endianness == ByteOrder.LITTLE_ENDIAN) result else result.reversedArray()
-    }
-
-    private fun Int.toByteArray(bytes: Int = 4, endianness: ByteOrder = ByteOrder.BIG_ENDIAN): ByteArray {
-        val result = ByteArray(bytes)
-        for (i in 0 until bytes) {
-            result[i] = this.ushr(i * 8).toByte()
-        }
-
-        return if (endianness == ByteOrder.LITTLE_ENDIAN) result else result.reversedArray()
-    }
-
-    private fun compress(input: String) : String {
-
-        val crc = CRC32()
-        val data = input.toByteArray()
-        crc.update(data)
-        val checksum = crc.value.toByteArray(endianness = ByteOrder.LITTLE_ENDIAN)
-        val total = checksum + data
-
-        Log.d("STRING", data.joinToString { String.format("%02X", it) })
-        Log.d("STRING", checksum.joinToString { String.format("%02X", it) })
-        Log.d("STRING", total.joinToString { String.format("%02X", it) })
-
-        val out = ByteArrayOutputStream()
-        val options = LZMA2Options()
-        options.lc = 3
-        options.lp = 0
-        options.pb = 2
-        options.dictSize = 128 * 1024
-
-        val lzmaOut = LZMAOutputStream(out, options, true)
-        lzmaOut.write(total)
-        lzmaOut.close()
-
-        val compressedData = out.toByteArray()
-
-        Log.d("STRING", compressedData.joinToString { String.format("%02X", it) })
-
-        val length = total.size.toByteArray(2, ByteOrder.LITTLE_ENDIAN)
-
-        Log.d("STRING", length.joinToString { String.format("%02X", it) })
-
-        val compressedWithLength = byteArrayOf(0x00, 0x00) + length + compressedData
-
-        Log.d("STRING", compressedWithLength.joinToString { String.format("%02X", it) })
-
-        // padded binary string
-
-        var binary = compressedWithLength.joinToString(separator="") {
-            it.toInt().and(0xFF).toString(2).padStart(8, '0')
-        }
-
-        Log.d("STRING", binary)
-
-        // Pad with zeros on the right up to a multiple of 5
-        var binaryLength = binary.length
-        val remainder = binaryLength % 5
-        if (remainder != 0) {
-            binary += "0".repeat(5 - remainder)
-            binaryLength += 5 - remainder
-        }
-
-        // Substitute each quintet of bits with corresponding character
-        val subst = "0123456789ABCDEFGHIJKLMNOPQRSTUV"
-        val result = StringBuilder()
-        for (i in binary.indices step 5) {
-            val quintet = binary.substring(i, i + 5)
-            val index = Integer.parseInt(quintet, 2)
-            result.append(subst[index])
-        }
-
-        Log.d("STRING", result.toString())
-
-        return result.toString()
-    }
-
 }

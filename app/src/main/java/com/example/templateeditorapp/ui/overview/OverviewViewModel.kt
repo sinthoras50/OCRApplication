@@ -14,6 +14,11 @@ import com.example.templateeditorapp.utils.ImageUtils
 import com.example.templateeditorapp.utils.TAG_IMAGE
 import kotlinx.coroutines.launch
 
+
+/**
+ * ViewModel class for the OverviewFragment.
+ * @param database: The ImageDatabase object that provides access to the annotated image data.
+ */
 class OverviewViewModel(val database: ImageDatabase) : ViewModel() {
 
     private val annotatedImages = mutableListOf<AnnotatedImage>()
@@ -27,6 +32,12 @@ class OverviewViewModel(val database: ImageDatabase) : ViewModel() {
     var currentIdx = 0
     var currentImageBoundingBox: RectF? = null
 
+    /**
+     * Loads the annotated images from the database and updates the current set of images.
+     * @param context: The context used to load the images.
+     * @param reqWidth: The required width for the loaded images.
+     * @param reqHeight: The required height for the loaded images.
+     */
     fun loadImages(context: Context, reqWidth: Int, reqHeight: Int) {
         if (annotatedImages.isNotEmpty()) return
 
@@ -42,6 +53,14 @@ class OverviewViewModel(val database: ImageDatabase) : ViewModel() {
         }
     }
 
+
+    /**
+     * Loads the annotated images from the database and updates the current set of images, starting at the specified image.
+     * @param imageName: The name of the image to start at.
+     * @param context: The context used to load the images.
+     * @param reqWidth: The required width for the loaded images.
+     * @param reqHeight: The required height for the loaded images.
+     */
     fun loadImages(imageName: String, context: Context, reqWidth: Int, reqHeight: Int) {
         if (annotatedImages.isNotEmpty()) return
 
@@ -57,6 +76,10 @@ class OverviewViewModel(val database: ImageDatabase) : ViewModel() {
         }
     }
 
+    /**
+     * Loads the next image in the current set of images.
+     * @return true if there is a next image, false otherwise.
+     */
     fun loadNextPhoto(): Boolean {
         if (currentIdx+1 >= annotatedImages.size) return false
 
@@ -67,6 +90,10 @@ class OverviewViewModel(val database: ImageDatabase) : ViewModel() {
         return true
     }
 
+    /**
+     * Loads the previous image in the current set of images.
+     * @return true if there is a previous image, false otherwise.
+     */
     fun loadPreviousPhoto(): Boolean {
         if (currentIdx-1 < 0) return false
 
@@ -77,6 +104,12 @@ class OverviewViewModel(val database: ImageDatabase) : ViewModel() {
         return true
     }
 
+    /**
+     * Deletes the currently selected image template.
+     *
+     * @param context The context to use for deleting the image file.
+     * @return `true` if the image was deleted successfully, `false` otherwise.
+     */
     fun deleteCurrentTemplate(context: Context): Boolean {
         if (_currentImageName.value.isNullOrEmpty()) return false
 

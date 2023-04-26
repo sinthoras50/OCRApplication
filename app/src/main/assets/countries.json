@@ -1,0 +1,226 @@
+
+
+
+[
+  {
+    "country": "DEFAULT",
+    "code": "DEFAULT",
+    "length": 34
+  },
+
+  {
+    "country": "Andorra",
+    "code": "AD",
+    "length": 24
+  },
+
+  {
+    "country": "Austria",
+    "code": "AT",
+    "length": 24
+  },
+
+  {
+    "country": "Belgium",
+    "code": "BE",
+    "length": 16
+  },
+
+  {
+    "country": "Bulgaria",
+    "code": "BG",
+    "length": 22
+  },
+
+  {
+    "country": "Croatia",
+    "code": "HR",
+    "length": 21
+  },
+
+  {
+    "country": "Cyprus",
+    "code": "CY",
+    "length": 28
+  },
+
+  {
+    "country": "Czech Republic",
+    "code": "CZ",
+    "length": 24
+  },
+
+  {
+    "country": "Denmark",
+    "code": "DK",
+    "length": 18
+  },
+
+  {
+    "country": "Estonia",
+    "code": "EE",
+    "length": 20
+  },
+
+  {
+    "country": "Finland",
+    "code": "FI",
+    "length": 18
+  },
+
+  {
+    "country": "France",
+    "code": "FR",
+    "length": 27
+  },
+
+  {
+    "country": "Germany",
+    "code": "DE",
+    "length": 22
+  },
+
+  {
+    "country": "Gibraltar",
+    "code": "GI",
+    "length": 23
+  },
+
+  {
+    "country": "Greece",
+    "code": "GR",
+    "length": 27
+  },
+
+  {
+    "country": "Holy See(the)",
+    "code": "VA",
+    "length": 22
+  },
+
+  {
+    "country": "Hungary",
+    "code": "HU",
+    "length": 28
+  },
+
+  {
+    "country": "Iceland",
+    "code": "IS",
+    "length": 26
+  },
+
+  {
+    "country": "Italy",
+    "code": "IT",
+    "length": 27
+  },
+
+  {
+    "country": "Latvia",
+    "code": "LV",
+    "length": 21
+  },
+
+  {
+    "country": "Liechtenstein",
+    "code": "LI",
+    "length": 21
+  },
+
+  {
+    "country": "Lithuania",
+    "code": "LT",
+    "length": 21
+  },
+
+  {
+    "country": "Luxemburg",
+    "code": "LU",
+    "length": 20
+  },
+
+  {
+    "country": "Malta",
+    "code": "MT",
+    "length": 31
+  },
+
+  {
+    "country": "Monaco",
+    "code": "MC",
+    "length": 27
+  },
+
+  {
+    "country": "Netherlands",
+    "code": "NL",
+    "length": 18
+  },
+
+  {
+    "country": "Norway",
+    "code": "NO",
+    "length": 15
+  },
+
+  {
+    "country": "Poland",
+    "code": "PO",
+    "length": 28
+  },
+
+  {
+    "country": "Portugal",
+    "code": "PT",
+    "length": 25
+  },
+
+  {
+    "country": "Romania",
+    "code": "RO",
+    "length": 24
+  },
+
+  {
+    "country": "San Marino",
+    "code": "SM",
+    "length": 27
+  },
+
+  {
+    "country": "Slovakia",
+    "code": "SK",
+    "length": 24
+  },
+
+  {
+    "country": "Slovenia",
+    "code": "SI",
+    "length": 19
+  },
+
+  {
+    "country": "Spain",
+    "code": "ES",
+    "length": 24
+  },
+
+  {
+    "country": "Sweden",
+    "code": "SE",
+    "length": 24
+  },
+
+  {
+    "country": "Switzerland",
+    "code": "CH",
+    "length": 21
+  },
+
+  {
+    "country": "United Kingdom",
+    "code": "GB",
+    "length": 22
+  }
+]

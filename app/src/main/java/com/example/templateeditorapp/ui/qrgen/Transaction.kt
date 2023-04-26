@@ -3,6 +3,7 @@ package com.example.templateeditorapp.ui.qrgen
 import android.net.Uri
 import android.util.Log
 import com.example.templateeditorapp.R
+import com.example.templateeditorapp.ui.tesseract.TesseractFragment
 import org.threeten.bp.LocalDate
 import org.threeten.bp.format.DateTimeFormatter
 import org.tukaani.xz.LZMA2Options
@@ -14,6 +15,9 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.zip.CRC32
 
+/**
+ * Enum class for Currency used for populating the currency spinner inside of the [TesseractFragment]
+ */
 enum class Currency(val value: String, val image: Int) {
     EUR("EUR", R.drawable.currency_flag_eu),
     CZK("CZK", R.drawable.currency_flag_cz),
@@ -24,6 +28,24 @@ enum class Currency(val value: String, val image: Int) {
     }
 }
 
+/**
+ * Data class representing a financial transaction.
+ *
+ * @property amount The amount of the transaction.
+ * @property currency The currency of the transaction.
+ * @property iban The IBAN of the beneficiary's account.
+ * @property beneficiaryName The name of the beneficiary.
+ * @property paymentId The payment ID of the transaction, default is an empty string.
+ * @property variableSymbol The variable symbol of the transaction, default is an empty string.
+ * @property constantSymbol The constant symbol of the transaction, default is an empty string.
+ * @property specificSymbol The specific symbol of the transaction, default is an empty string.
+ * @property note The note of the transaction, default is an empty string.
+ * @property swift The SWIFT code of the beneficiary's bank, default is an empty string.
+ * @property isRecurring Boolean indicating whether the transaction is recurring, default is false.
+ * @property isIncasso Boolean indicating whether the transaction is incasso, default is false.
+ * @property beneficiaryAddress1 The first line of the beneficiary's address, default is an empty string.
+ * @property beneficiaryAddress2 The second line of the beneficiary's address, default is an empty string.
+ */
 data class Transaction(
     val amount: BigDecimal,
     val currency: String,
@@ -49,10 +71,20 @@ data class Transaction(
     private val recurring = if (isRecurring) "1" else "0"
     private val incasso = if (isIncasso) "1" else "0"
 
+    /**
+     * Returns the data as a string, where individual values are separated by a tab.
+     */
     private fun getFormattedData(): String {
         return "$paymentId\t$paymentType\t$paymentType\t${"%.2f".format(amount)}\t${currency}\t$date\t$variableSymbol\t$constantSymbol\t$specificSymbol\t$sepaFormat\t$note\t$paymentTargetAccountType\t$iban\t$swift\t$recurring\t$incasso\t$beneficiaryName\t$beneficiaryAddress1\t$beneficiaryAddress2\t"
     }
 
+
+    /**
+     * Extension function to convert Long to ByteArray with specified number of bytes and endianness.
+     * @param bytes Number of bytes to use for the output ByteArray.
+     * @param endianness The endianness of the output ByteArray, defaults to BIG_ENDIAN.
+     * @return ByteArray representation of the Long.
+     */
     private fun Long.toByteArray(bytes: Int = 4, endianness: ByteOrder = ByteOrder.BIG_ENDIAN): ByteArray {
         val result = ByteArray(bytes)
         for (i in 0 until bytes) {
@@ -62,6 +94,12 @@ data class Transaction(
         return if (endianness == ByteOrder.LITTLE_ENDIAN) result else result.reversedArray()
     }
 
+    /**
+     * Extension function to convert Int to ByteArray with specified number of bytes and endianness.
+     * @param bytes Number of bytes to use for the output ByteArray.
+     * @param endianness The endianness of the output ByteArray, defaults to BIG_ENDIAN.
+     * @return ByteArray representation of the Int.
+     */
     private fun Int.toByteArray(bytes: Int = 4, endianness: ByteOrder = ByteOrder.BIG_ENDIAN): ByteArray {
         val result = ByteArray(bytes)
         for (i in 0 until bytes) {
@@ -71,6 +109,11 @@ data class Transaction(
         return if (endianness == ByteOrder.LITTLE_ENDIAN) result else result.reversedArray()
     }
 
+
+    /**
+     * Function to generate payme.sk payment link based on the specified parameters.
+     * @return The generated payment link.
+     */
     fun getPaymentLink(): String {
         val paymentReference = "/VS$variableSymbol/SS$specificSymbol/KS$constantSymbol"
         val uri = Uri.Builder()
@@ -88,6 +131,11 @@ data class Transaction(
         return uri.toString()
     }
 
+
+    /**
+     * Function to compress data using LZMA2 algorithm and generate a padded binary string.
+     * @return The generated padded binary string.
+     */
     fun getCompressedData(): String {
 
         val crc = CRC32()

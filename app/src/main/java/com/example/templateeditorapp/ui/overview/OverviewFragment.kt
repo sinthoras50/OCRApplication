@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.navigation.fragment.findNavController
+import androidx.viewpager.widget.ViewPager
 import com.example.templateeditorapp.OcrApp
 import com.example.templateeditorapp.R
 import com.example.templateeditorapp.databinding.FragmentOverviewBinding
@@ -33,7 +34,10 @@ import com.example.templateeditorapp.utils.TAG_IMAGE
 import com.example.templateeditorapp.utils.TEMPLATE_KEY
 import com.google.android.material.button.MaterialButton
 
-
+/**
+ * A fragment that displays an overview of the images stored in the app's database.
+ * Uses a [ViewPager] to display a list of [Bitmap] images.
+ */
 class OverviewFragment : Fragment() {
 
     companion object {
@@ -47,6 +51,11 @@ class OverviewFragment : Fragment() {
     private lateinit var viewModel: OverviewViewModel
     private lateinit var binding: FragmentOverviewBinding
 
+    /**
+     * Called when the fragment is created. Initializes [viewModel] with the [ImageDatabase].
+     *
+     * @param savedInstanceState The saved instance state bundle.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
@@ -75,6 +84,12 @@ class OverviewFragment : Fragment() {
         return binding.root
     }
 
+    /**
+     * Called when the fragment's view is created and the view hierarchy is created. Initializes UI of the fragment.
+     *
+     * @param view The created view.
+     * @param savedInstanceState The saved instance state bundle.
+     */
     @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -85,11 +100,6 @@ class OverviewFragment : Fragment() {
         binding.viewPager.adapter = adapter
         binding.viewPager.isUserInputEnabled = false
 
-//        viewModel.currentImage.observe(viewLifecycleOwner) { bitmap ->
-//            binding.overviewImageView.setImageBitmap(bitmap)
-//            adapter.notifyDataSetChanged()
-//        } )
-
         viewModel.imageSet.observe(viewLifecycleOwner) { imageSet ->
             images.clear()
             images.addAll(imageSet)
@@ -97,10 +107,6 @@ class OverviewFragment : Fragment() {
             binding.overviewLoadingPanel.visibility = View.GONE
             binding.viewPager.setCurrentItem(viewModel.currentIdx, false)
         }
-
-//        viewModel.currentImageName.observe(viewLifecycleOwner) { name ->
-//            binding.templateNameTextView.text = name
-//        }
 
         val reqWidth = resources.displayMetrics.widthPixels
         val reqHeight = resources.displayMetrics.heightPixels
@@ -110,10 +116,7 @@ class OverviewFragment : Fragment() {
         val args = arguments
         val currentImage: String? = args?.getString(OVERVIEW_KEY)
 
-
         if (currentImage != null) {
-//            viewModel.upsertImage(currentImage, requireContext(), reqWidth, reqHeight)
-//            viewModel.loadImages(requireContext(), reqWidth, reqHeight)
             viewModel.loadImages(currentImage, requireContext(), reqWidth, reqHeight)
             binding.viewPager.doOnPreDraw {
                 binding.viewPager.setCurrentItem(viewModel.currentIdx, false)
@@ -132,9 +135,6 @@ class OverviewFragment : Fragment() {
                 binding.viewPager.setCurrentItem(viewModel.currentIdx, true)
                 Log.d(TAG_IMAGE, "current index = ${viewModel.currentIdx}")
             }
-
-//            viewModel.loadPreviousPhoto(requireContext(), reqWidth, reqHeight)
-
         }
 
 
@@ -143,9 +143,6 @@ class OverviewFragment : Fragment() {
                 binding.viewPager.setCurrentItem(viewModel.currentIdx, true)
                 Log.d(TAG_IMAGE, "current index = ${viewModel.currentIdx}")
             }
-
-//            viewModel.loadNextPhoto(requireContext(), reqWidth, reqHeight)
-//            viewModel.loadNextPhoto()
         }
 
         binding.btnDeleteTemplate.setOnClickListener {
@@ -179,7 +176,6 @@ class OverviewFragment : Fragment() {
             }
 
             dialog.show()
-
 
         }
 

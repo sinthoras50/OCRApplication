@@ -5,10 +5,12 @@ import android.graphics.RectF
 import android.hardware.Camera
 import android.util.Log
 import androidx.core.graphics.toRect
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.room.RoomDatabase
+import com.example.templateeditorapp.ui.camera.TemplateCameraFragment
 import com.example.templateeditorapp.utils.TAG_IMAGE
 import org.opencv.android.CameraBridgeViewBase
 import org.opencv.calib3d.Calib3d
@@ -34,6 +36,10 @@ enum class FocusMode(val value: String) {
     FIXED(Camera.Parameters.FOCUS_MODE_FIXED)
 }
 
+/**
+ * ViewModel class that manages the camera functionality of the [CameraFragment].
+ * Provides methods to take pictures, preprocess images and perform homography to align images.
+ */
 class CameraViewModel(val database: RoomDatabase) : ViewModel() {
 
     private val _focusMode = MutableLiveData<String>(FocusMode.FIXED.value)
@@ -49,6 +55,9 @@ class CameraViewModel(val database: RoomDatabase) : ViewModel() {
     val focusMode: LiveData<String> = _focusMode
     val flashMode: LiveData<String> = _flashMode
 
+    /**
+     * Allocates memory of the [preprocessMat] according to the dimensions of the camera
+     */
     fun initDimensions(width: Int, height: Int) {
         cameraWidth = width
         cameraHeight = height
@@ -56,6 +65,12 @@ class CameraViewModel(val database: RoomDatabase) : ViewModel() {
         preprocessMat = Mat(width, height, CvType.CV_8UC1)
     }
 
+
+    /**
+     * Takes a picture using the camera specified by the given [CameraBridgeViewBase].
+     * @param filename The name of the file to save the picture to.
+     * @param bridgeViewBase The CameraBridgeViewBase object representing the camera.
+     */
     fun takePicture(filename: String, bridgeViewBase: CameraBridgeViewBase) {
         val camera = bridgeViewBase as MyCameraView
         camera.setFlash(_flashMode.value!!)
@@ -63,6 +78,13 @@ class CameraViewModel(val database: RoomDatabase) : ViewModel() {
         camera.takePicture(filename)
     }
 
+    /**
+     * Crops an OpenCV Mat image using the provided crop rectangle.
+     *
+     * @param image the input image to be cropped
+     * @param cropRect the rectangle defining the region to be cropped
+     * @return a new Mat image containing the cropped region
+     */
     fun cropImage(image: Mat, cropRect: Rect): Mat {
         val opencvRect = cropRect.let {
             org.opencv.core.Rect(it.left, it.top, it.width(), it.height())
@@ -73,6 +95,16 @@ class CameraViewModel(val database: RoomDatabase) : ViewModel() {
         return cropped
     }
 
+    /**
+     * Aligns two images using the ORB feature detector and descriptor extractor.
+     *
+     * @param mat1 The first input image
+     * @param mat2 The second input image to be aligned with the first image
+     * @param maxFeatures The maximum number of features to be detected by ORB
+     * @param keepPercent The percentage of the best feature matches to be kept for computing the homography matrix
+     * @param cropRect Optional crop rectangle to apply to the second image before alignment
+     * @return The aligned output image
+     */
     fun alignImage(mat1: Mat, mat2: Mat, maxFeatures: Int = 500, keepPercent: Double = 0.2, cropRect: RectF? = null): Mat {
         var croppedTemplate = Mat()
 
@@ -147,6 +179,14 @@ class CameraViewModel(val database: RoomDatabase) : ViewModel() {
 
     }
 
+    /**
+     * Preprocesses the input image [mat] using the specified [PreprocessMethod].
+     *
+     * @param mat The input image to be preprocessed.
+     * @param method The preprocessing method to be applied.
+     *
+     * @return The preprocessed image as a `Mat` object.
+     */
     fun preprocess(mat: Mat, method: PreprocessMethod): Mat {
         return when(method) {
             PreprocessMethod.NONE -> mat
@@ -156,6 +196,13 @@ class CameraViewModel(val database: RoomDatabase) : ViewModel() {
         }
     }
 
+
+    /**
+     * Applies a threshold operation to the input image.
+     *
+     * @param mat the input image as a [Mat] object.
+     * @return the preprocessed image as a [Mat] object.
+     */
     private fun thresh(mat: Mat): Mat {
         val gray = Mat()
         Imgproc.cvtColor(mat, gray, Imgproc.COLOR_RGB2GRAY)
@@ -170,6 +217,12 @@ class CameraViewModel(val database: RoomDatabase) : ViewModel() {
         return preprocessMat
     }
 
+    /**
+     * Applies the Hough transform to the input image.
+     *
+     * @param mat the input image as a [Mat] object.
+     * @return the preprocessed image as a [Mat] object.
+     */
     private fun hough(mat: Mat): Mat {
         val tolerance = 5.0
 
@@ -212,6 +265,13 @@ class CameraViewModel(val database: RoomDatabase) : ViewModel() {
         return preprocessMat
     }
 
+
+    /**
+     * Applies morphological opening to the input image.
+     *
+     * @param mat The input image to be preprocessed.
+     * @return The preprocessed image with morphological opening applied.
+     */
     private fun morph(mat: Mat): Mat {
         val gray = Mat()
         Imgproc.cvtColor(mat, gray, Imgproc.COLOR_RGB2GRAY)
@@ -230,6 +290,9 @@ class CameraViewModel(val database: RoomDatabase) : ViewModel() {
         return preprocessMat
     }
 
+    /**
+     * This function is called when the flash button is clicked. It cycles through the different flash modes (on, auto, off).
+     */
     fun onClickFlash() {
         when(_flashMode.value) {
             FlashMode.ON.value -> _flashMode.value = FlashMode.AUTO.value
@@ -238,6 +301,9 @@ class CameraViewModel(val database: RoomDatabase) : ViewModel() {
         }
     }
 
+    /**
+     * This function is called when the focus button is clicked. It cycles through the different focus modes (fixed, auto).
+     */
     fun onClickFocus() {
         when(_focusMode.value) {
             FocusMode.FIXED.value -> _focusMode.value = FocusMode.AUTO.value

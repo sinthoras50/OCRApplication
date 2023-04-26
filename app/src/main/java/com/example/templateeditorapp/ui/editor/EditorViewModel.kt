@@ -18,6 +18,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.templateeditorapp.db.AnnotatedImage
 import com.example.templateeditorapp.db.ImageDatabase
+import com.example.templateeditorapp.ui.camera.TemplateCameraFragment
+import com.example.templateeditorapp.ui.opencv.CameraFragment
 import com.example.templateeditorapp.utils.ImageUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -25,6 +27,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
+/**
+ * ViewModel class that manages the functionality of the [EditorViewModel].
+ * Provides methods to rotate the image, create [BoundingBox] rectangles that specify field names in the given document.
+ */
 class EditorViewModel(val database: ImageDatabase) : ViewModel() {
 
     private lateinit var canvas: Canvas
@@ -48,6 +54,11 @@ class EditorViewModel(val database: ImageDatabase) : ViewModel() {
     var scaleMult = 1f
     val imageData: LiveData<ImageData> = _imageData
 
+    /**
+     * Handle the result of receiving an image from the camera of the [CameraFragment].
+     * @param data The data returned from the image picker intent.
+     * @param contentResolver The content resolver used to open the selected image file.
+     */
     fun handleImageResult(data: Intent?, contentResolver: ContentResolver) {
         val imageUri = data?.data
         val imageStream = imageUri?.let { contentResolver.openInputStream(it) }
@@ -60,6 +71,11 @@ class EditorViewModel(val database: ImageDatabase) : ViewModel() {
         canvas = Canvas(mutableBitmap)
     }
 
+    /**
+     * Handle the result of selecting an image from the device's gallery.
+     * @param path The path to the selected image file.
+     * @param context The context used to load the selected image file.
+     */
     fun handleImageResult(path: String, context: Context) {
         val bitmap = ImageUtils.loadPhoto(path, context)
         val mutableBitmap = bitmap!!.copy(Bitmap.Config.ARGB_8888, true)
@@ -70,6 +86,10 @@ class EditorViewModel(val database: ImageDatabase) : ViewModel() {
         canvas = Canvas(mutableBitmap)
     }
 
+    /**
+     * Update the spinner items to reflect the currently selected bounding boxes.
+     * @param spinner The spinner used to display the available form field options.
+     */
     fun updateSpinnerItems(spinner: Spinner) {
         val adapter = spinner.adapter as EditorSpinnerAdapter
         val selected = boundingBoxes.map { it.fieldName }
@@ -82,12 +102,19 @@ class EditorViewModel(val database: ImageDatabase) : ViewModel() {
         }
     }
 
+    /**
+     * Draws the crop rectangle on the canvas, if it exists.
+     */
     private fun drawCropRect() {
         if (cropRect != null) {
             canvas.drawRect(cropRect!!, strokePaint)
         }
     }
 
+    /**
+     * Draws bounding boxes on the canvas, with a filled rectangle and stroke around the edges.
+     * Also calls the helper function `drawText` to label each bounding box with its associated field name.
+     */
     private fun drawBoundingBoxes() {
         boundingBoxes.forEach {
             canvas.drawRect(it.rect, fillPaint)
@@ -97,6 +124,12 @@ class EditorViewModel(val database: ImageDatabase) : ViewModel() {
         }
     }
 
+    /**
+     * Refreshes the canvas with the original bitmap and applies the given image matrix.
+     * Calls [drawBoundingBoxes] and [drawCropRect] to redraw any bounding boxes or crop rectangles.
+     *
+     * @param imageMatrix The matrix to apply to the image.
+     */
     private fun refreshCanvas(imageMatrix: Matrix) {
         val mutableBitmap = currentBitmap.copy(Bitmap.Config.ARGB_8888, true)
         _imageData.value = ImageData(mutableBitmap, imageMatrix, true)
@@ -108,6 +141,12 @@ class EditorViewModel(val database: ImageDatabase) : ViewModel() {
 
     }
 
+    /**
+     * Rotates the image 90 degrees to the right.
+     * Clears any existing bounding boxes or crop rectangle and updates the spinner items.
+     *
+     * @param spinner The spinner to update with the new bounding box options.
+     */
     fun rotateRight90Deg(spinner: Spinner) {
         boundingBoxes.clear()
         cropRect = null
@@ -124,6 +163,13 @@ class EditorViewModel(val database: ImageDatabase) : ViewModel() {
         canvas = Canvas(mutableBitmap)
     }
 
+    /**
+     * Removes the last [BoundingBox] in the list of bounding boxes and refreshes the canvas.
+     * If there are no bounding boxes, this function does nothing.
+     *
+     * @param spinner The spinner used to select bounding box field names.
+     * @param imageMatrix The matrix used to transform the image.
+     */
     fun removeLastBoundingBox(spinner: Spinner, imageMatrix: Matrix) {
         if (boundingBoxes.size == 0) return
 
@@ -135,15 +181,17 @@ class EditorViewModel(val database: ImageDatabase) : ViewModel() {
         boundingBoxes.removeLast()
 
         refreshCanvas(imageMatrix)
-//
-//        val mutableBitmap = currentBitmap.copy(Bitmap.Config.ARGB_8888, true)
-//        _imageData.value = ImageData(mutableBitmap, imageMatrix, true)
-//
-//        canvas = Canvas(mutableBitmap)
-//
-//        drawBoundingBoxes()
     }
 
+    /**
+     * Removes the [BoundingBox] at the given position in the list of bounding boxes and refreshes the canvas.
+     * If there are no bounding boxes, this function does nothing.
+     * If the bounding box at the given position does not exist, this function does nothing.
+     *
+     * @param position The position of the bounding box to remove.
+     * @param spinner The spinner used to select bounding box field names.
+     * @param imageMatrix The matrix used to transform the image.
+     */
     fun removeBoundingBoxAt(position: Int, spinner: Spinner, imageMatrix: Matrix) {
         if (boundingBoxes.size == 0) return
 
@@ -158,15 +206,16 @@ class EditorViewModel(val database: ImageDatabase) : ViewModel() {
         boundingBoxes.removeIf { it.fieldName == boundingBoxName }
 
         refreshCanvas(imageMatrix)
-
-//        val mutableBitmap = currentBitmap.copy(Bitmap.Config.ARGB_8888, true)
-//        _imageData.value = ImageData(mutableBitmap, imageMatrix, true)
-//
-//        canvas = Canvas(mutableBitmap)
-//
-//        drawBoundingBoxes()
     }
 
+    /**
+     * Implements an onTouchListener, allowing the user to edit or create new [BoundingBox] rectangles.
+     *
+     * @param view the view that received the touch event
+     * @param event the motion event that was triggered
+     * @param spinner the spinner used to select the type of bounding box to edit
+     * @return true if the event was handled, false otherwise
+     */
     fun onTouchListenerEdit(view: View, event: MotionEvent, spinner: Spinner): Boolean {
         val spinnerSelectedPosition = spinner.selectedItemPosition
         val adapter = spinner.adapter as EditorSpinnerAdapter
@@ -254,6 +303,13 @@ class EditorViewModel(val database: ImageDatabase) : ViewModel() {
         return true
     }
 
+    /**
+     * Implements an onTouchListener, allowing the user to select a region of interest within the [Bitmap].
+     *
+     * @param view The view that received the touch event.
+     * @param event The motion event that was triggered.
+     * @return True if the event was handled, false otherwise.
+     */
     fun onTouchListenerSelect(view: View, event: MotionEvent): Boolean {
         val photoView = view as MyPhotoView
 
@@ -306,6 +362,16 @@ class EditorViewModel(val database: ImageDatabase) : ViewModel() {
         return true
     }
 
+
+    /**
+     * Draws the given text within the specified rectangle on the canvas.
+     * The text will be truncated with ellipses if it exceeds the maximum width
+     * of the rectangle.
+     *
+     * @param canvas The canvas to draw the text on.
+     * @param text The text to draw.
+     * @param rect The rectangle within which to draw the text.
+     */
     private fun drawText(canvas: Canvas, text: String, rect: RectF) {
         val vMargin = 10f
         val textPaint = TextPaint().apply {
@@ -337,6 +403,11 @@ class EditorViewModel(val database: ImageDatabase) : ViewModel() {
         canvas.restore()
     }
 
+    /**
+     * Clears the selection rectangle and refreshes the canvas.
+     *
+     * @param view [MyPhotoView] instance
+     */
     fun clearSelectionRect(view: View) {
         cropRect = null
         val imageView = view as MyPhotoView
@@ -345,6 +416,13 @@ class EditorViewModel(val database: ImageDatabase) : ViewModel() {
         refreshCanvas(suppMatrix)
     }
 
+    /**
+     * Saves the current image as a template with the given filename and bounding boxes and crop rectangle to the database
+     * and saves the image to the device's storage.
+     *
+     * @param filename the filename of the template
+     * @param context the application context
+     */
     fun saveTemplate(filename: String, context: Context) {
         if (::currentBitmap.isInitialized.not()) return
 
@@ -359,6 +437,15 @@ class EditorViewModel(val database: ImageDatabase) : ViewModel() {
         }
     }
 
+
+    /**
+     * Loads a template with the given filename from the database, loads the corresponding image from the device's storage,
+     * and sets the image data and bounding boxes of the loaded template.
+     *
+     * @param filename the filename of the template to load
+     * @param context the application context
+     * @param spinner the spinner to update with the loaded template's filename
+     */
     fun loadTemplate(filename: String, context: Context, spinner: Spinner) {
         viewModelScope.launch {
             val annotatedImage = database.annotatedImageDao().getImage(filename)

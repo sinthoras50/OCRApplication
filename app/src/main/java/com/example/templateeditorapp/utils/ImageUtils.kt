@@ -3,9 +3,11 @@ package com.example.templateeditorapp.utils
 import android.Manifest
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
@@ -19,12 +21,20 @@ import org.opencv.core.*
 import org.opencv.features2d.DescriptorMatcher
 import org.opencv.features2d.ORB
 import org.opencv.imgproc.Imgproc
+import java.io.File
 import java.io.IOException
 
 const val TAG_IMAGE = "TAG_IMAGE"
-
+/**
+ * Singleton object containing utility functions for working with images.
+ */
 object ImageUtils {
 
+    /**
+     * Converts a [Bitmap] image to a [Mat] image, which is the image format used by OpenCV.
+     * @param bitmap the bitmap image to convert
+     * @return the [Mat] image converted from the [bitmap]
+     */
     fun bitmapToMat(bitmap: Bitmap): Mat {
         val res = Mat()
         try {
@@ -36,6 +46,11 @@ object ImageUtils {
         return res
     }
 
+    /**
+     * Converts a [Mat] image to a [Bitmap] image.
+     * @param mat the Mat image to convert
+     * @return the [Bitmap] image converted from the [mat]
+     */
     fun matToBitmap(mat: Mat): Bitmap? {
         var bmp : Bitmap? = null
         try {
@@ -48,6 +63,12 @@ object ImageUtils {
         return bmp
     }
 
+    /**
+     * Loads a photo from the internal storage of the app.
+     * @param filename the name of the file to load
+     * @param context the context of the app
+     * @return the loaded [Bitmap] image, or null if the file could not be found or loaded
+     */
     fun loadPhoto(filename: String, context: Context): Bitmap? {
         return try {
             val file = context.filesDir.listFiles()?.find { it.nameWithoutExtension == filename } ?: throw IOException("File could not be found")
@@ -61,6 +82,14 @@ object ImageUtils {
         }
     }
 
+    /**
+     * Loads a photo from the internal storage of the app, scaling it to the given dimensions if necessary.
+     * @param filename the name of the file to load
+     * @param context the context of the app
+     * @param reqWidth the maximum required width of the image
+     * @param reqHeight the maximum required height of the image
+     * @return the loaded and possibly scaled [Bitmap] image, or null if the file could not be found or loaded
+     */
     fun loadPhoto(filename: String, context: Context, reqWidth: Int, reqHeight: Int): Bitmap? {
         return try {
             val file = context.filesDir.listFiles()?.find { it.nameWithoutExtension == filename } ?: throw IOException("File could not be found")
@@ -100,6 +129,12 @@ object ImageUtils {
         }
     }
 
+    /**
+     * Deletes the photo with the given [filename] from the app's internal storage.
+     * @param filename The name of the file to be deleted.
+     * @param context The context of the app.
+     * @return `true` if the file was successfully deleted, `false` otherwise.
+     */
     fun deletePhoto(filename: String, context: Context): Boolean {
         return try {
             context.deleteFile(filename)
@@ -109,6 +144,14 @@ object ImageUtils {
         }
     }
 
+    /**
+     * Saves the given [bitmap] to internal storage with the specified filename.
+     *
+     * @param filename The name of the file to save the bitmap to.
+     * @param bitmap The bitmap to be saved.
+     * @param context The context of the current state of the application.
+     * @return Returns `true` if the bitmap was successfully saved, `false` otherwise.
+     */
     fun savePhoto(filename: String, bitmap: Bitmap, context: Context): Boolean {
         return try {
             context.openFileOutput("$filename.jpg", Context.MODE_PRIVATE).use { stream ->
@@ -124,6 +167,15 @@ object ImageUtils {
         }
     }
 
+    /**
+     * Saves a [Bitmap] image to the external storage, with the given [filename].
+     *
+     * @param filename the name of the file to save the image to
+     * @param bitmap the bitmap image to save
+     * @param context the context in which to save the image
+     * @return `true` if the image was successfully saved, `false` otherwise
+     * @throws IOException if there was an error during the saving process
+     */
     fun savePhotoToExternalStorage(filename: String, bitmap: Bitmap, context: Context): Boolean {
         val imageCollection = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val contentValues = ContentValues().apply {
@@ -142,9 +194,11 @@ object ImageUtils {
             } ?: throw IOException("Couldn't save bitmap")
 
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-                contentValues.clear()
-                contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, "$filename.jpg")
-                context.contentResolver.update(uri, contentValues, null, null)
+                val file = File(uri.path)
+                val newFile = File(file.parent, "$filename.jpg")
+                if (file.renameTo(newFile)) {
+                    context.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(newFile)))
+                }
             }
 
             true
@@ -153,6 +207,4 @@ object ImageUtils {
             false
         }
     }
-
-
 }

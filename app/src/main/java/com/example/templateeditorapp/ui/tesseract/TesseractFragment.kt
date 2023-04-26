@@ -26,6 +26,9 @@ import com.googlecode.tesseract.android.TessBaseAPI
 import kotlinx.coroutines.*
 import java.lang.IllegalArgumentException
 
+/**
+ * A fragment for performing OCR using Tesseract.
+ */
 class TesseractFragment : Fragment() {
 
     companion object {
@@ -39,8 +42,19 @@ class TesseractFragment : Fragment() {
     private lateinit var binding: FragmentTesseractBinding
     private lateinit var viewModel: TesseractViewModel
 
+    /**
+     * Called when the fragment is being created.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val language = Assets.language
+
+//         extract assets into the device's memory
+        Assets.extractAsset(requireContext(), "$language.traineddata", "tessdata")
+        Assets.extractAsset(requireContext(), "countries.json", "countriesdata")
+        TransactionValidationUtils.initCountries(requireContext())
+
         viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
                 if (modelClass.isAssignableFrom(TesseractViewModel::class.java)) {
@@ -51,12 +65,10 @@ class TesseractFragment : Fragment() {
             }
         }).get(TesseractViewModel::class.java)
 
-        Assets.extractAssets(requireContext())
-
         if (!viewModel.isInitialized()) {
-            val dataPath = Assets.getTessDataPath(requireContext())
-            val language = Assets.language
-            viewModel.initTesseract(dataPath, language, TessBaseAPI.OEM_TESSERACT_LSTM_COMBINED)
+            val dataPath = Assets.getDataPath(requireContext())
+
+            viewModel.initTesseract(dataPath, Assets.language, TessBaseAPI.OEM_TESSERACT_LSTM_COMBINED)
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -73,6 +85,9 @@ class TesseractFragment : Fragment() {
         })
     }
 
+    /**
+     * Called when the view is being created.
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -85,6 +100,9 @@ class TesseractFragment : Fragment() {
         return binding.root
     }
 
+    /**
+     * Performs OCR as soon as the view has been initialized. Initializes and updates UI with the result of the OCR process.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -119,6 +137,9 @@ class TesseractFragment : Fragment() {
 
     }
 
+    /**
+     * Initializes the [Currency] spinner.
+     */
     private fun initializeCurrencyDropdown() {
         val spinner = binding.amountCurrencySpinner
 //        val items = listOf(*resources.getStringArray(R.array.formFieldsCurrency))
