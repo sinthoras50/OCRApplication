@@ -119,10 +119,12 @@ class SharedViewModel(val database: ImageDatabase) : ViewModel() {
         return Template(annotatedImages[idx], currentHighResBitmap!!)
     }
 
-    fun deleteTemplate(context: Context, filename: String) {
+    fun deleteTemplate(context: Context, filename: String?): Boolean {
+        if (filename == null) return false
+
         val idx = annotatedImages.indexOfFirst { it.imageName == filename }
 
-        if (idx == -1) return
+        if (idx == -1) return false
 
         ImageUtils.deletePhoto(filename, context)
 
@@ -149,6 +151,8 @@ class SharedViewModel(val database: ImageDatabase) : ViewModel() {
                 currentHighResBitmap = ImageUtils.loadPhoto(_currentImageName.value!!, context)
             }
         }
+
+        return true
     }
 
     /**

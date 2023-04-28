@@ -50,9 +50,9 @@ class OverviewFragment : Fragment() {
         (requireActivity().application as OcrApp).db
     }
 
-    private val sharedViewModel: SharedViewModel by activityViewModels()
+    private val viewModel: SharedViewModel by activityViewModels()
 
-    private lateinit var viewModel: OverviewViewModel
+//    private lateinit var viewModel: OverviewViewModel
     private lateinit var binding: FragmentOverviewBinding
 
     /**
@@ -62,15 +62,15 @@ class OverviewFragment : Fragment() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                if (modelClass.isAssignableFrom(OverviewViewModel::class.java)) {
-                    @Suppress("UNCHECKED_CAST")
-                    return OverviewViewModel(db) as T
-                }
-                throw java.lang.IllegalArgumentException("Unknown ViewModel class")
-            }
-        }).get(OverviewViewModel::class.java)
+//        viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
+//            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+//                if (modelClass.isAssignableFrom(OverviewViewModel::class.java)) {
+//                    @Suppress("UNCHECKED_CAST")
+//                    return OverviewViewModel(db) as T
+//                }
+//                throw java.lang.IllegalArgumentException("Unknown ViewModel class")
+//            }
+//        }).get(OverviewViewModel::class.java)
 
         val files = requireContext().fileList()
         Log.d(TAG_IMAGE, "dir contents = ${files.joinToString(separator = ", ")}")
@@ -129,7 +129,7 @@ class OverviewFragment : Fragment() {
 
 
         binding.btnPreviousTemplate.setOnClickListener {
-            if (viewModel.loadPreviousPhoto()) {
+            if (viewModel.loadPreviousPhoto(requireContext())) {
                 binding.viewPager.setCurrentItem(viewModel.currentIdx.value!!, true)
                 Log.d(TAG_IMAGE, "current index = ${viewModel.currentIdx}")
             }
@@ -137,7 +137,7 @@ class OverviewFragment : Fragment() {
 
 
         binding.btnNextTemplate.setOnClickListener {
-            if (viewModel.loadNextPhoto()) {
+            if (viewModel.loadNextPhoto(requireContext())) {
                 binding.viewPager.setCurrentItem(viewModel.currentIdx.value!!, true)
                 Log.d(TAG_IMAGE, "current index = ${viewModel.currentIdx}")
             }
@@ -158,7 +158,7 @@ class OverviewFragment : Fragment() {
 
             dialogView.findViewById<MaterialButton>(R.id.btnDeleteTemplate).setOnClickListener {
 
-                if (viewModel.deleteCurrentTemplate(requireContext())) {
+                if (viewModel.deleteTemplate(requireContext(), viewModel.currentImageName.value!!)) {
                     binding.viewPager.setCurrentItem(viewModel.currentIdx.value!!, false)
                     Log.d(TAG_IMAGE, "current index = ${viewModel.currentIdx}")
                     Toast.makeText(requireContext(), "Template deleted", Toast.LENGTH_SHORT).show()
