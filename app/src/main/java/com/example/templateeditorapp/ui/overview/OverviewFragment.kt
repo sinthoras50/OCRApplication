@@ -120,13 +120,19 @@ class OverviewFragment : Fragment() {
         val args = arguments
         val currentImage: String? = args?.getString(OVERVIEW_KEY)
 
-
-        viewModel.loadImages(requireContext(), reqWidth, reqHeight)
-        binding.viewPager.doOnPreDraw {
-            binding.viewPager.setCurrentItem(viewModel.currentIdx.value!!, false)
+        if (currentImage != null) {
+            viewModel.loadImages(currentImage, requireContext(), reqWidth, reqHeight)
+            binding.viewPager.doOnPreDraw {
+                binding.viewPager.setCurrentItem(viewModel.currentIdx.value!!, false)
+            }
+            Log.d(TAG_IMAGE, "currentTemplate != null currIdx = ${viewModel.currentIdx}")
+        } else {
+            viewModel.loadImages(requireContext(), reqWidth, reqHeight)
+            binding.viewPager.doOnPreDraw {
+                binding.viewPager.setCurrentItem(viewModel.currentIdx.value!!, false)
+            }
+            Log.d(TAG_IMAGE, "currentTemplate == null currIdx = ${viewModel.currentIdx}")
         }
-        Log.d(TAG_IMAGE, "currentTemplate == null currIdx = ${viewModel.currentIdx}")
-
 
         binding.btnPreviousTemplate.setOnClickListener {
             if (viewModel.loadPreviousPhoto()) {
