@@ -48,6 +48,7 @@ object TransactionUtils {
      * @return Returns `true` if the IBAN is valid, `false` otherwise
      */
     fun isValidIban(iban: String): Boolean {
+        if (iban == "") return true
         if (iban.length < 5 || iban.length > 34) return false
 
         val regex = Regex("[a-zA-Z0-9]+")
@@ -131,7 +132,7 @@ object TransactionUtils {
     }
 
     /**
-     * Atempts to fix the iban, fixing the most common OCR errors and also using levenshtein distance to find the closest match
+     * Attempts to fix the iban, fixing the most common OCR errors and also using levenshtein distance to find the closest match
      * of the country code and bank code - if bank codes have been specified for the given country
      *
      * @param iban Iban to be fixed

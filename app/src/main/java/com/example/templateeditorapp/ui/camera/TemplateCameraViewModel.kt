@@ -25,7 +25,7 @@ import kotlin.math.min
  */
 class TemplateCameraViewModel : ViewModel() {
 
-    private val _focusMode = MutableLiveData<String>(FocusMode.FIXED.value)
+    private val _focusMode = MutableLiveData<String>(FocusMode.INFINITY.value)
     private val _flashMode = MutableLiveData<String>(FlashMode.OFF.value)
 
     val focusMode: LiveData<String> = _focusMode
@@ -44,9 +44,12 @@ class TemplateCameraViewModel : ViewModel() {
     }
 
     /**
-     * Toggles the flash mode between ON, AUTO, and OFF.
+     * This function is called when the flash button is clicked. It cycles through the different flash modes (on, auto, off).
      */
-    fun onClickFlash() {
+    fun onClickFlash(flashModes: List<String>) {
+
+        if (FlashMode.ON.value !in flashModes) return
+
         when(_flashMode.value) {
             FlashMode.ON.value -> _flashMode.value = FlashMode.AUTO.value
             FlashMode.AUTO.value -> _flashMode.value = FlashMode.OFF.value
@@ -55,12 +58,15 @@ class TemplateCameraViewModel : ViewModel() {
     }
 
     /**
-     * Toggles the focus mode between FIXED and AUTO.
+     * This function is called when the focus button is clicked. It cycles through the different focus modes (fixed, auto).
      */
-    fun onClickFocus() {
+    fun onClickFocus(focusModes: List<String>) {
+
+        if (FocusMode.AUTO.value !in focusModes) return
+
         when(_focusMode.value) {
-            FocusMode.FIXED.value -> _focusMode.value = FocusMode.AUTO.value
-            FocusMode.AUTO.value -> _focusMode.value = FocusMode.FIXED.value
+            FocusMode.INFINITY.value -> _focusMode.value = FocusMode.AUTO.value
+            FocusMode.AUTO.value -> _focusMode.value = FocusMode.INFINITY.value
         }
     }
 

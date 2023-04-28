@@ -238,6 +238,27 @@
                         app:layout_constraintEnd_toEndOf="@+id/btnNextTemplate"
                         app:layout_constraintStart_toStartOf="@+id/btnPreviousTemplate" />
 
+                    <carbon.widget.TextView
+                        android:id="@+id/templateNumberTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:alpha="0.5"
+                        android:background="@color/black"
+                        android:ellipsize="end"
+                        android:gravity="center"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:singleLine="true"
+                        android:text="@{(viewModel.currentIdx+1) + `/` + viewModel.imageSet.size()}"
+                        android:textAlignment="center"
+                        android:textColor="@color/white"
+                        android:textSize="15sp"
+                        android:layout_marginTop="10dp"
+                        app:carbon_cornerRadius="15dp"
+                        app:layout_constraintEnd_toStartOf="@+id/btnConfirmSelection"
+                        app:layout_constraintStart_toEndOf="@+id/btnDeleteTemplate"
+                        app:layout_constraintTop_toTopOf="parent" />
+
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
 

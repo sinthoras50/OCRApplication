@@ -147,7 +147,7 @@ class TemplateCameraFragment : Fragment(), CameraBridgeViewBase.CvCameraViewList
         viewModel.focusMode.observe(viewLifecycleOwner) { focusMode ->
             val btn = binding.btnFocus as MaterialButton
             when(focusMode) {
-                FocusMode.FIXED.value -> {
+                FocusMode.INFINITY.value -> {
                     btn.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_do_disturb_24)
                 }
                 FocusMode.AUTO.value -> {
@@ -182,11 +182,13 @@ class TemplateCameraFragment : Fragment(), CameraBridgeViewBase.CvCameraViewList
         }
 
         binding.btnFlash.setOnClickListener {
-            viewModel.onClickFlash()
+            val flashModes = (cameraBridgeViewBase as MyCameraView).getSupportedFlashModes()
+            viewModel.onClickFlash(flashModes)
         }
 
         binding.btnFocus.setOnClickListener {
-            viewModel.onClickFocus()
+            val focusModes = (cameraBridgeViewBase as MyCameraView).getSupportedFocusModes()
+            viewModel.onClickFocus(focusModes)
         }
 
     }

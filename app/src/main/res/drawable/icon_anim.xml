@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+    <aapt:attr name="android:drawable">
+        <vector
+            android:name="vector"
+            android:width="192dp"
+            android:height="192dp"
+            android:viewportWidth="666"
+            android:viewportHeight="666">
+            <group android:name="wrapper">
+                <path
+                    android:name="clippath22"
+                    android:pathData="M 310.666 104.001 C 336.58 103.699 364.18 102.123 385.332 108.001 C 471.499 131.953 524.069 181.693 553.332 262.668 C 561.823 286.16 570.368 337.16 562.665 370.667 C 558.736 387.758 555.823 405.829 549.332 421.334 C 517.903 496.424 458.174 542.839 370.666 562.667 C 334.734 570.808 283.401 561.093 258.666 552 C 183.558 524.387 135.836 475.006 112 396.001 C 104.899 372.461 98.189 328.605 105.333 297.334 C 109.237 280.241 112.189 262.176 118.666 246.668 C 142.646 189.247 189.237 142.637 246.666 118.668 C 260.886 114.668 275.113 110.668 289.333 106.668 C 296.005 104.993 305.463 107.228 310.666 104.001 Z M 321.333 117.335 C 315.401 120.903 304.863 118.145 297.333 120.001 C 280.745 124.087 263.07 128.129 247.999 134.668 C 191.573 159.148 149.565 205.928 128 265.334 C 124.889 279.109 121.777 292.892 118.666 306.668 C 111.788 337.736 120.55 374.826 128 397.334 C 150.085 464.069 189.562 507.091 251.999 533.334 C 271.333 541.46 315.35 557.483 346.666 550.667 C 366.208 546.412 385.292 546.361 402.666 540 C 461.984 518.283 508.945 476.548 533.332 420.001 C 555.247 369.182 554.513 302.153 533.332 252.001 C 499.812 172.632 434.07 117.275 321.333 117.335 Z"
+                    android:fillAlpha="0"
+                    android:strokeColor="#000000"
+                    android:strokeAlpha="0"
+                    android:strokeWidth="2"
+                    android:strokeLineCap="round"
+                    android:strokeLineJoin="round"
+                    android:fillType="evenOdd"/>
+            </group>
+            <group android:name="wrapper_1">
+                <path
+                    android:name="clippath34"
+                    android:pathData="M 333.332 149.335 L 333.332 162.668 C 250.321 161.807 199.141 214.484 174.666 273.334 C 162.75 301.989 158.174 349.738 169.333 384.001 C 190.22 448.134 248.553 505.444 333.332 505.334 L 333.332 518.667 C 240.443 519.778 183.74 461.874 158.666 394.667 C 146.512 362.089 145.212 302.334 158.666 269.334 C 185.55 203.391 240.487 149.092 333.332 149.335 Z"
+                    android:fillAlpha="0"
+                    android:strokeColor="#000000"
+                    android:strokeAlpha="0"
+                    android:strokeWidth="2"
+                    android:strokeLineCap="round"/>
+            </group>
+            <group android:name="wrapper_2">
+                <path
+                    android:name="clippath46"
+                    android:pathData="M 326.666 196.001 C 387.487 195.244 421.683 190.916 445.332 229.334 C 451.275 238.986 459.18 258.274 454.666 277.334 C 452.366 287.041 449.067 297.873 443.999 305.334 C 437.08 315.521 423.07 326.221 410.666 330.668 C 401.776 332.001 392.888 333.334 383.999 334.668 C 391.59 343.086 393.914 355.317 399.999 365.334 C 413.782 388.026 426.191 413.325 439.999 436.001 C 445.6 445.201 447.431 456.571 454.666 464.001 C 453.824 466.339 454.408 465.295 453.332 466.667 C 450.626 469.291 446.906 470.913 442.666 472.001 C 440.426 463.158 433.651 455.079 429.332 448.001 C 422.683 437.102 419.963 425.577 413.332 414.667 C 405.375 401.577 396.522 386.938 389.332 373.334 C 386.416 367.817 371.931 335.142 369.332 333.334 L 339.999 333.334 L 339.999 472.001 L 326.666 472.001 L 326.666 196.001 Z M 339.999 209.335 L 339.999 320.001 C 390.196 320.844 421.474 320.206 435.999 285.334 C 438.507 279.314 443.75 268.984 441.332 258.668 C 429.906 209.873 400.052 208.335 339.999 209.335 Z"
+                    android:fillAlpha="0"
+                    android:strokeColor="#000000"
+                    android:strokeAlpha="0"
+                    android:strokeWidth="2"
+                    android:strokeLineCap="round"/>
+            </group>
+        </vector>
+    </aapt:attr>
+    <target android:name="clippath22">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:propertyName="strokeAlpha"
+                    android:duration="250"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:valueType="floatType"
+                    android:interpolator="@android:anim/linear_interpolator"/>
+                <objectAnimator
+                    android:propertyName="fillAlpha"
+                    android:duration="250"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:valueType="floatType"
+                    android:interpolator="@android:anim/linear_interpolator"/>
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="clippath34">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:propertyName="strokeAlpha"
+                    android:startOffset="250"
+                    android:duration="250"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:valueType="floatType"
+                    android:interpolator="@android:anim/linear_interpolator"/>
+                <objectAnimator
+                    android:propertyName="fillAlpha"
+                    android:startOffset="250"
+                    android:duration="250"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:valueType="floatType"
+                    android:interpolator="@android:anim/linear_interpolator"/>
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="clippath46">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:propertyName="strokeAlpha"
+                    android:startOffset="500"
+                    android:duration="250"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:valueType="floatType"
+                    android:interpolator="@android:anim/linear_interpolator"/>
+                <objectAnimator
+                    android:propertyName="fillAlpha"
+                    android:startOffset="500"
+                    android:duration="250"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:valueType="floatType"
+                    android:interpolator="@android:anim/linear_interpolator"/>
+            </set>
+        </aapt:attr>
+    </target>
+</animated-vector>

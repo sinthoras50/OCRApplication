@@ -32,8 +32,8 @@ enum class FlashMode(val value: String) {
 }
 
 enum class FocusMode(val value: String) {
-    AUTO(Camera.Parameters.FOCUS_MODE_AUTO),
-    FIXED(Camera.Parameters.FOCUS_MODE_FIXED)
+    AUTO(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE),
+    INFINITY(Camera.Parameters.FOCUS_MODE_FIXED)
 }
 
 /**
@@ -42,7 +42,7 @@ enum class FocusMode(val value: String) {
  */
 class CameraViewModel(val database: RoomDatabase) : ViewModel() {
 
-    private val _focusMode = MutableLiveData<String>(FocusMode.FIXED.value)
+    private val _focusMode = MutableLiveData<String>(FocusMode.INFINITY.value)
     private val _flashMode = MutableLiveData<String>(FlashMode.OFF.value)
 
     private var cameraWidth: Int? = null
@@ -105,7 +105,7 @@ class CameraViewModel(val database: RoomDatabase) : ViewModel() {
      * @param cropRect Optional crop rectangle to apply to the second image before alignment
      * @return The aligned output image
      */
-    fun alignImage(mat1: Mat, mat2: Mat, maxFeatures: Int = 500, keepPercent: Double = 0.2, cropRect: RectF? = null): Mat {
+    fun alignImage(mat1: Mat, mat2: Mat, maxFeatures: Int = 500, keepPercent: Double = 0.2, cropRect: RectF? = null): Mat? {
         var croppedTemplate = Mat()
 
         if (cropRect != null) {
@@ -148,6 +148,9 @@ class CameraViewModel(val database: RoomDatabase) : ViewModel() {
 
         val reducedMatches = matchesList.subList(0, (keepPercent * matchesList.size).toInt())
 
+        // findHomography requires at least 4 matches, so we return null
+        if (reducedMatches.size < 4) return null
+
         // homography matrix
         val pts1 = mutableListOf<Point>()
         val pts2 = mutableListOf<Point>()
@@ -155,6 +158,8 @@ class CameraViewModel(val database: RoomDatabase) : ViewModel() {
         val keypoints1 = kp1.toArray()
         val keypoints2 = kp2.toArray()
 
+
+        Log.d("HOMOGRAPHY", "matches length = ${reducedMatches.size}")
         for (match in reducedMatches) {
             pts1.add(keypoints1[match.queryIdx].pt)
             pts2.add(keypoints2[match.trainIdx].pt)
@@ -164,6 +169,11 @@ class CameraViewModel(val database: RoomDatabase) : ViewModel() {
         val pts2Mat = MatOfPoint2f(*pts2.toTypedArray())
 
         val model = Calib3d.findHomography(pts1Mat, pts2Mat, Calib3d.RANSAC, 5.0)
+
+        Log.d("HOMOGRAPHY", "model = ${model.width()}, ${model.height()}, ${model.type()}")
+
+        // model needs to be a 3x3 matrix
+        if (model.width() != 3 || model.height() != 3) return null
 
         // align images using the perspective transformation
 
@@ -293,7 +303,10 @@ class CameraViewModel(val database: RoomDatabase) : ViewModel() {
     /**
      * This function is called when the flash button is clicked. It cycles through the different flash modes (on, auto, off).
      */
-    fun onClickFlash() {
+    fun onClickFlash(flashModes: List<String>) {
+
+        if (FlashMode.ON.value !in flashModes) return
+
         when(_flashMode.value) {
             FlashMode.ON.value -> _flashMode.value = FlashMode.AUTO.value
             FlashMode.AUTO.value -> _flashMode.value = FlashMode.OFF.value
@@ -304,10 +317,13 @@ class CameraViewModel(val database: RoomDatabase) : ViewModel() {
     /**
      * This function is called when the focus button is clicked. It cycles through the different focus modes (fixed, auto).
      */
-    fun onClickFocus() {
+    fun onClickFocus(focusModes: List<String>) {
+
+        if (FocusMode.AUTO.value !in focusModes) return
+
         when(_focusMode.value) {
-            FocusMode.FIXED.value -> _focusMode.value = FocusMode.AUTO.value
-            FocusMode.AUTO.value -> _focusMode.value = FocusMode.FIXED.value
+            FocusMode.INFINITY.value -> _focusMode.value = FocusMode.AUTO.value
+            FocusMode.AUTO.value -> _focusMode.value = FocusMode.INFINITY.value
         }
     }
 

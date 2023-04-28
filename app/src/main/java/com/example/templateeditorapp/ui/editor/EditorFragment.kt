@@ -21,10 +21,12 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.ContextCompat.checkSelfPermission
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModel
 import androidx.navigation.fragment.findNavController
 import com.example.templateeditorapp.OcrApp
 import com.example.templateeditorapp.R
+import com.example.templateeditorapp.SharedViewModel
 import com.example.templateeditorapp.databinding.FragmentEditorBinding
 import com.example.templateeditorapp.db.ImageDatabase
 import com.example.templateeditorapp.utils.OVERVIEW_KEY
@@ -44,6 +46,8 @@ class EditorFragment : Fragment() {
     private val minImageScale = 1.0f
     private val mediumImageScale = 5.0f
     private val maxImageScale = 10.0f
+
+    private val sharedViewModel: SharedViewModel by activityViewModels()
 
     companion object {
         fun newInstance() = EditorFragment()

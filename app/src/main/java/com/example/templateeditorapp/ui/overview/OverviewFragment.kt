@@ -18,6 +18,7 @@ import android.widget.Toast
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
@@ -25,6 +26,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewpager.widget.ViewPager
 import com.example.templateeditorapp.OcrApp
 import com.example.templateeditorapp.R
+import com.example.templateeditorapp.SharedViewModel
 import com.example.templateeditorapp.databinding.FragmentOverviewBinding
 import com.example.templateeditorapp.db.ImageDatabase
 import com.example.templateeditorapp.ui.editor.DEBUG
@@ -47,6 +49,8 @@ class OverviewFragment : Fragment() {
     private val db: ImageDatabase by lazy {
         (requireActivity().application as OcrApp).db
     }
+
+    private val sharedViewModel: SharedViewModel by activityViewModels()
 
     private lateinit var viewModel: OverviewViewModel
     private lateinit var binding: FragmentOverviewBinding
@@ -90,7 +94,7 @@ class OverviewFragment : Fragment() {
      * @param view The created view.
      * @param savedInstanceState The saved instance state bundle.
      */
-    @SuppressLint("NotifyDataSetChanged")
+    @SuppressLint("NotifyDataSetChanged", "SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -105,7 +109,7 @@ class OverviewFragment : Fragment() {
             images.addAll(imageSet)
             adapter.notifyDataSetChanged()
             binding.overviewLoadingPanel.visibility = View.GONE
-            binding.viewPager.setCurrentItem(viewModel.currentIdx, false)
+            binding.viewPager.setCurrentItem(viewModel.currentIdx.value!!, false)
         }
 
         val reqWidth = resources.displayMetrics.widthPixels
@@ -116,23 +120,17 @@ class OverviewFragment : Fragment() {
         val args = arguments
         val currentImage: String? = args?.getString(OVERVIEW_KEY)
 
-        if (currentImage != null) {
-            viewModel.loadImages(currentImage, requireContext(), reqWidth, reqHeight)
-            binding.viewPager.doOnPreDraw {
-                binding.viewPager.setCurrentItem(viewModel.currentIdx, false)
-            }
-            Log.d(TAG_IMAGE, "currentTemplate != null currIdx = ${viewModel.currentIdx}")
-        } else {
-            viewModel.loadImages(requireContext(), reqWidth, reqHeight)
-            binding.viewPager.doOnPreDraw {
-                binding.viewPager.setCurrentItem(viewModel.currentIdx, false)
-            }
-            Log.d(TAG_IMAGE, "currentTemplate == null currIdx = ${viewModel.currentIdx}")
+
+        viewModel.loadImages(requireContext(), reqWidth, reqHeight)
+        binding.viewPager.doOnPreDraw {
+            binding.viewPager.setCurrentItem(viewModel.currentIdx.value!!, false)
         }
+        Log.d(TAG_IMAGE, "currentTemplate == null currIdx = ${viewModel.currentIdx}")
+
 
         binding.btnPreviousTemplate.setOnClickListener {
             if (viewModel.loadPreviousPhoto()) {
-                binding.viewPager.setCurrentItem(viewModel.currentIdx, true)
+                binding.viewPager.setCurrentItem(viewModel.currentIdx.value!!, true)
                 Log.d(TAG_IMAGE, "current index = ${viewModel.currentIdx}")
             }
         }
@@ -140,7 +138,7 @@ class OverviewFragment : Fragment() {
 
         binding.btnNextTemplate.setOnClickListener {
             if (viewModel.loadNextPhoto()) {
-                binding.viewPager.setCurrentItem(viewModel.currentIdx, true)
+                binding.viewPager.setCurrentItem(viewModel.currentIdx.value!!, true)
                 Log.d(TAG_IMAGE, "current index = ${viewModel.currentIdx}")
             }
         }
@@ -161,7 +159,7 @@ class OverviewFragment : Fragment() {
             dialogView.findViewById<MaterialButton>(R.id.btnDeleteTemplate).setOnClickListener {
 
                 if (viewModel.deleteCurrentTemplate(requireContext())) {
-                    binding.viewPager.setCurrentItem(viewModel.currentIdx, false)
+                    binding.viewPager.setCurrentItem(viewModel.currentIdx.value!!, false)
                     Log.d(TAG_IMAGE, "current index = ${viewModel.currentIdx}")
                     Toast.makeText(requireContext(), "Template deleted", Toast.LENGTH_SHORT).show()
                 } else {

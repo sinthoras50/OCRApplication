@@ -9,10 +9,12 @@ import android.view.LayoutInflater
 import android.view.SurfaceView
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -26,9 +28,7 @@ import com.example.templateeditorapp.ui.editor.EditorFragment
 import com.example.templateeditorapp.ui.tesseract.TesseractFragment
 import com.example.templateeditorapp.utils.*
 import com.google.android.material.button.MaterialButton
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.opencv.android.BaseLoaderCallback
 import org.opencv.android.CameraBridgeViewBase
 import org.opencv.android.LoaderCallbackInterface
@@ -63,7 +63,6 @@ class CameraFragment : Fragment(), CameraBridgeViewBase.CvCameraViewListener2, P
     private lateinit var mRGBA: Mat
     private lateinit var mRGBAT: Mat
     private lateinit var mRotatedFrame: Mat
-
 
     /**
      * Called when the fragment is being created.
@@ -160,7 +159,7 @@ class CameraFragment : Fragment(), CameraBridgeViewBase.CvCameraViewListener2, P
         viewModel.focusMode.observe(viewLifecycleOwner) { focusMode ->
             val btn = binding.btnFocus as MaterialButton
             when(focusMode) {
-                FocusMode.FIXED.value -> {
+                FocusMode.INFINITY.value -> {
                     btn.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_do_disturb_24)
                 }
                 FocusMode.AUTO.value -> {
@@ -195,11 +194,13 @@ class CameraFragment : Fragment(), CameraBridgeViewBase.CvCameraViewListener2, P
         }
 
         binding.btnFlash.setOnClickListener {
-            viewModel.onClickFlash()
+            val flashModes = (cameraBridgeViewBase as MyCameraView).getSupportedFlashModes()
+            viewModel.onClickFlash(flashModes)
         }
 
         binding.btnFocus.setOnClickListener {
-            viewModel.onClickFocus()
+            val focusModes = (cameraBridgeViewBase as MyCameraView).getSupportedFocusModes()
+            viewModel.onClickFocus(focusModes)
         }
 
     }
@@ -276,15 +277,17 @@ class CameraFragment : Fragment(), CameraBridgeViewBase.CvCameraViewListener2, P
 
         val photo = ImageUtils.loadPhoto(TEMP_PHOTO_PATH, requireContext())
         val photoMat = ImageUtils.bitmapToMat(photo!!)
-        val alignedMat = viewModel.alignImage(photoMat, templateMat, cropRect = cropRect)
+        val alignedMat = viewModel.alignImage(photoMat, templateMat, cropRect = cropRect) ?: let {
+            Toast.makeText(requireContext(), "Unable to process this image, please try again.", Toast.LENGTH_SHORT).show()
+            (cameraBridgeViewBase as MyCameraView).restartPreview()
+            binding.btnCapture.visibility = View.VISIBLE
+            binding.btnFlash.visibility = View.VISIBLE
+            binding.btnFocus.visibility = View.VISIBLE
+            return@onPictureTaken
+        }
+
         val resultMat = viewModel.preprocess(alignedMat, PreprocessMethod.THRESH)
         val resultBitmap = ImageUtils.matToBitmap(resultMat)
-
-//        ImageUtils.savePhoto("testing", resultBitmap!!, requireContext())
-//
-//        val args = Bundle()
-//        args.putString("image","testing")
-//        findNavController().navigate(R.id.action_cameraFragment_to_testingFragment, args)
 
         ImageUtils.savePhoto(TEMP_PHOTO_PATH, resultBitmap!!, requireContext())
 

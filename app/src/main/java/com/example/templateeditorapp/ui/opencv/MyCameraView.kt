@@ -76,6 +76,24 @@ class MyCameraView(context: Context?, attrs: AttributeSet?) : JavaCameraView(con
     }
 
     /**
+     * Get supported flash modes
+     *
+     * @return List of supported flash modes
+     */
+    fun getSupportedFlashModes(): List<String> {
+        return mCamera.parameters.supportedFlashModes ?: listOf()
+    }
+
+    /**
+     * Get supported focus modes
+     *
+     * @return List of supported focus modes
+     */
+    fun getSupportedFocusModes(): List<String> {
+        return mCamera.parameters.supportedFocusModes
+    }
+
+    /**
      * Takes a picture and saves it to the device.
      *
      * @param fileName The name to be used when saving the picture.
@@ -84,6 +102,9 @@ class MyCameraView(context: Context?, attrs: AttributeSet?) : JavaCameraView(con
         Log.i(TAG, "Taking picture")
         mPictureFileName = fileName
         mCamera.setPreviewCallback(null)
+
+        Log.i("OPENCV", "${mCamera.parameters.focusMode}")
+        Log.i("OPENCV", "${mCamera.parameters.flashMode}")
 
         val sizes = mCamera.parameters.supportedPictureSizes
         sizes.sortBy { it.height + it.width }
@@ -111,5 +132,14 @@ class MyCameraView(context: Context?, attrs: AttributeSet?) : JavaCameraView(con
                 pictureTakenListener.onPictureTaken()
             }
         }
+    }
+
+    /**
+     * A helper function to restart the preview of the camera.
+     *
+     */
+    fun restartPreview() {
+        mCamera.startPreview()
+        mCamera.setPreviewCallback(this)
     }
 }

@@ -25,11 +25,12 @@ class OverviewViewModel(val database: ImageDatabase) : ViewModel() {
 
     private val _imageSet = MutableLiveData<List<Bitmap>>()
     private val _currentImageName = MutableLiveData<String>("")
+    private val _currentIdx = MutableLiveData<Int>(0)
 
     val imageSet: LiveData<List<Bitmap>> = _imageSet
     val currentImageName: LiveData<String> = _currentImageName
+    val currentIdx: LiveData<Int> = _currentIdx
 
-    var currentIdx = 0
     var currentImageBoundingBox: RectF? = null
 
     /**
@@ -46,9 +47,9 @@ class OverviewViewModel(val database: ImageDatabase) : ViewModel() {
 
             if (annotatedImages.isEmpty()) return@launch
 
-            currentIdx = 0
-            currentImageBoundingBox = annotatedImages[currentIdx].cropRect
-            _currentImageName.value = annotatedImages[currentIdx].imageName
+            _currentIdx.value = 0
+            currentImageBoundingBox = annotatedImages[_currentIdx.value!!].cropRect
+            _currentImageName.value = annotatedImages[_currentIdx.value!!].imageName
             _imageSet.value = annotatedImages.mapNotNull { ImageUtils.loadPhoto(it.imageName, context, reqWidth, reqHeight) }
         }
     }
@@ -69,9 +70,9 @@ class OverviewViewModel(val database: ImageDatabase) : ViewModel() {
 
             if (annotatedImages.isEmpty()) return@launch
 
-            currentIdx = annotatedImages.indexOfFirst { it.imageName == imageName }
-            currentImageBoundingBox = annotatedImages[currentIdx].cropRect
-            _currentImageName.value = annotatedImages[currentIdx].imageName
+            _currentIdx.value = annotatedImages.indexOfFirst { it.imageName == imageName }
+            currentImageBoundingBox = annotatedImages[_currentIdx.value!!].cropRect
+            _currentImageName.value = annotatedImages[_currentIdx.value!!].imageName
             _imageSet.value = annotatedImages.mapNotNull { ImageUtils.loadPhoto(it.imageName, context, reqWidth, reqHeight) }
         }
     }
@@ -81,11 +82,11 @@ class OverviewViewModel(val database: ImageDatabase) : ViewModel() {
      * @return true if there is a next image, false otherwise.
      */
     fun loadNextPhoto(): Boolean {
-        if (currentIdx+1 >= annotatedImages.size) return false
+        if (_currentIdx.value!!+1 >= annotatedImages.size) return false
 
-        currentIdx++
-        currentImageBoundingBox = annotatedImages[currentIdx].cropRect
-        _currentImageName.value = annotatedImages[currentIdx].imageName
+        _currentIdx.value = _currentIdx.value!! + 1
+        currentImageBoundingBox = annotatedImages[_currentIdx.value!!].cropRect
+        _currentImageName.value = annotatedImages[_currentIdx.value!!].imageName
 
         return true
     }
@@ -95,11 +96,11 @@ class OverviewViewModel(val database: ImageDatabase) : ViewModel() {
      * @return true if there is a previous image, false otherwise.
      */
     fun loadPreviousPhoto(): Boolean {
-        if (currentIdx-1 < 0) return false
+        if (_currentIdx.value!!-1 < 0) return false
 
-        currentIdx--
-        currentImageBoundingBox = annotatedImages[currentIdx].cropRect
-        _currentImageName.value = annotatedImages[currentIdx].imageName
+        _currentIdx.value = _currentIdx.value!! - 1
+        currentImageBoundingBox = annotatedImages[_currentIdx.value!!].cropRect
+        _currentImageName.value = annotatedImages[_currentIdx.value!!].imageName
 
         return true
     }
@@ -129,10 +130,10 @@ class OverviewViewModel(val database: ImageDatabase) : ViewModel() {
             lst.toList()
         }
 
-        currentIdx = (currentIdx).coerceAtMost((annotatedImages.size-1).coerceAtLeast(0))
-        currentImageBoundingBox = if (annotatedImages.size > 0) annotatedImages[currentIdx].cropRect else null
+        _currentIdx.value = (_currentIdx.value!!).coerceAtMost((annotatedImages.size-1).coerceAtLeast(0))
+        currentImageBoundingBox = if (annotatedImages.size > 0) annotatedImages[_currentIdx.value!!].cropRect else null
 
-        _currentImageName.value = if (annotatedImages.size > 0) annotatedImages[currentIdx].imageName else ""
+        _currentImageName.value = if (annotatedImages.size > 0) annotatedImages[_currentIdx.value!!].imageName else ""
         _imageSet.value = updatedList
 
         return true
