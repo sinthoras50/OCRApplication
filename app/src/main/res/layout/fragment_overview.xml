@@ -6,7 +6,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.example.templateeditorapp.SharedViewModel" />
+            type="com.example.templateeditorapp.SharedImageViewModel" />
     </data>
 
     <LinearLayout

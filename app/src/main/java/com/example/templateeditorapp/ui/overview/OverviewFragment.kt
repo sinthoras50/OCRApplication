@@ -7,26 +7,19 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
-import android.text.Html
-import android.text.method.LinkMovementMethod
-import android.text.method.MovementMethod
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager.widget.ViewPager
 import com.example.templateeditorapp.OcrApp
 import com.example.templateeditorapp.R
-import com.example.templateeditorapp.SharedViewModel
+import com.example.templateeditorapp.SharedImageViewModel
 import com.example.templateeditorapp.databinding.FragmentOverviewBinding
 import com.example.templateeditorapp.db.ImageDatabase
 import com.example.templateeditorapp.ui.editor.DEBUG
@@ -38,7 +31,7 @@ import com.google.android.material.button.MaterialButton
 
 /**
  * A fragment that displays an overview of the images stored in the app's database.
- * Uses a [ViewPager] to display a list of [Bitmap] images.
+ * Uses a [ViewPager] to display a list of [Bitmap] images. The fragment is managed by a shared [SharedImageViewModel].
  */
 class OverviewFragment : Fragment() {
 
@@ -46,13 +39,8 @@ class OverviewFragment : Fragment() {
         fun newInstance() = OverviewFragment()
     }
 
-    private val db: ImageDatabase by lazy {
-        (requireActivity().application as OcrApp).db
-    }
+    private val viewModel: SharedImageViewModel by activityViewModels()
 
-    private val viewModel: SharedViewModel by activityViewModels()
-
-//    private lateinit var viewModel: OverviewViewModel
     private lateinit var binding: FragmentOverviewBinding
 
     /**
@@ -62,15 +50,6 @@ class OverviewFragment : Fragment() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
-//            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-//                if (modelClass.isAssignableFrom(OverviewViewModel::class.java)) {
-//                    @Suppress("UNCHECKED_CAST")
-//                    return OverviewViewModel(db) as T
-//                }
-//                throw java.lang.IllegalArgumentException("Unknown ViewModel class")
-//            }
-//        }).get(OverviewViewModel::class.java)
 
         val files = requireContext().fileList()
         Log.d(TAG_IMAGE, "dir contents = ${files.joinToString(separator = ", ")}")
@@ -117,11 +96,6 @@ class OverviewFragment : Fragment() {
 
         Log.d(TAG_IMAGE, "photoview w = $reqWidth h = $reqHeight")
 
-        val args = arguments
-        val currentImage: String? = args?.getString(OVERVIEW_KEY)
-
-
-        viewModel.loadImages(requireContext(), reqWidth, reqHeight)
         binding.viewPager.doOnPreDraw {
             binding.viewPager.setCurrentItem(viewModel.currentIdx.value!!, false)
         }
@@ -187,6 +161,7 @@ class OverviewFragment : Fragment() {
             if (viewModel.currentImageName.value.isNullOrEmpty().not()) {
                 args.putString(TEMPLATE_KEY, viewModel.currentImageName.value)
             }
+            viewModel.editMode = true
             findNavController().navigate(R.id.action_overviewFragment_to_editorFragment, args)
         }
 
