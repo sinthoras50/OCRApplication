@@ -83,7 +83,7 @@ class TemplateSelectionFragment : Fragment() {
     /**
      * Start an image picker activity to allow the user to select an image
      */
-    fun pickImage() {
+    private fun pickImage() {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.type = "image/*"
         startActivityForResult(intent, PICK_IMAGE)

@@ -3,23 +3,23 @@ package com.example.templateeditorapp
 import android.content.Context
 import android.database.sqlite.SQLiteException
 import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Matrix
 import android.graphics.RectF
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.templateeditorapp.db.AnnotatedImage
 import com.example.templateeditorapp.db.ImageDatabase
-import com.example.templateeditorapp.ui.editor.ImageData
+import com.example.templateeditorapp.ui.overview.OverviewFragment
 import com.example.templateeditorapp.utils.ImageUtils
-import com.example.templateeditorapp.utils.TAG_IMAGE
 import kotlinx.coroutines.*
-import kotlin.coroutines.CoroutineContext
 
-class SharedViewModel(val database: ImageDatabase) : ViewModel() {
+/**
+ * This shared ViewModel serves two main purposes: firstly, to display the template images in the OverviewFragment,
+ * and secondly, to facilitate the transfer of images across multiple fragments without the need for bundles.
+ * @property database A Room image database
+ */
+class SharedImageViewModel(val database: ImageDatabase) : ViewModel() {
 
     private val annotatedImages = mutableListOf<AnnotatedImage>()
 
@@ -32,6 +32,8 @@ class SharedViewModel(val database: ImageDatabase) : ViewModel() {
     val imageSet: LiveData<List<Bitmap>> = _imageSet
     val currentImageName: LiveData<String> = _currentImageName
     val currentIdx: LiveData<Int> = _currentIdx
+
+    var editMode = false
 
     var currentImageBoundingBox: RectF? = null
     var currentHighResBitmap: Bitmap? = null
@@ -62,11 +64,27 @@ class SharedViewModel(val database: ImageDatabase) : ViewModel() {
         }
     }
 
-    fun getIndexOf(name: String): Int {
+    /**
+     * Get index of the image specified by [name]
+     *
+     * @param name
+     * @return Returns index of [name]
+     */
+    private fun getIndexOf(name: String): Int {
         return annotatedImages.indexOfFirst { it.imageName == name }
     }
 
-    fun saveTemplate(context: Context, annotatedImage: AnnotatedImage, bitmap: Bitmap) {
+
+    /**
+     * Save template
+     *
+     * @param context
+     * @param annotatedImage
+     * @param bitmap
+     */
+    fun saveTemplate(context: Context, template: Template) {
+
+        val (annotatedImage, bitmap) = template
         viewModelScope.launch {
             try {
                 database.annotatedImageDao().insertImage(annotatedImage)
@@ -111,18 +129,33 @@ class SharedViewModel(val database: ImageDatabase) : ViewModel() {
         }
     }
 
+    /**
+     * Loads the template specified by the [filename]
+     *
+     * @param filename Name of the template to be retrieved
+     * @return Returns a [Template] that contains an [AnnotatedImage] and a [Bitmap] or null filename doesn't exist
+     */
     fun loadTemplate(filename: String): Template? {
         val idx = getIndexOf(filename)
 
-        if (idx == -1) return null
+        if (idx == -1 || currentHighResBitmap == null) return null
 
         return Template(annotatedImages[idx], currentHighResBitmap!!)
     }
 
-    fun deleteTemplate(context: Context, filename: String) {
+    /**
+     * Deletes the template specified by the [filename]
+     *
+     * @param context Context used to access the device's storage to delete an image
+     * @param filename Name of the template to be removed
+     * @return Returns true if deletion was successful, false otherwise
+     */
+    fun deleteTemplate(context: Context, filename: String?): Boolean {
+        if (filename == null) return false
+
         val idx = annotatedImages.indexOfFirst { it.imageName == filename }
 
-        if (idx == -1) return
+        if (idx == -1) return false
 
         ImageUtils.deletePhoto(filename, context)
 
@@ -149,6 +182,8 @@ class SharedViewModel(val database: ImageDatabase) : ViewModel() {
                 currentHighResBitmap = ImageUtils.loadPhoto(_currentImageName.value!!, context)
             }
         }
+
+        return true
     }
 
     /**

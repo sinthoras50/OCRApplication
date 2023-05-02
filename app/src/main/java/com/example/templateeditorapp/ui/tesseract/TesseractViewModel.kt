@@ -4,10 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.Rect
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import com.example.templateeditorapp.db.ImageDatabase
 import com.example.templateeditorapp.ui.editor.BoundingBox
@@ -20,6 +17,7 @@ import com.googlecode.tesseract.android.TessBaseAPI
 import com.googlecode.tesseract.android.TessBaseAPI.ProgressValues
 import kotlinx.coroutines.*
 import java.util.*
+import javax.xml.transform.Transformer
 
 /**
  * [ViewModel] class for controlling the Tesseract OCR functionality and user input validation of the [Transaction] data
@@ -103,7 +101,39 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
 
     val progress: LiveData<Int> = _progress
 
-    val resultMap = HashMap<String, String>()
+    val currency = MutableLiveData<String>("EUR")
+
+    // according to SBA standard, the user can use only one of VS/SS/CS or payment reference
+    val paymentRefEnabled = MediatorLiveData<Boolean>().apply {
+        this.addSource(constantSymbol) {
+            if (it.isNotBlank()) {
+                this.value = false
+            } else if (variableSymbol.value.isNullOrBlank() && specificSymbol.value.isNullOrBlank()) {
+                this.value = true
+            }
+        }
+        this.addSource(variableSymbol) {
+            if (it.isNotBlank()) {
+                this.value = false
+            } else if (constantSymbol.value.isNullOrBlank() && specificSymbol.value.isNullOrBlank()) {
+                this.value = true
+            }
+        }
+
+        this.addSource(specificSymbol) {
+            if (it.isNotBlank()) {
+                this.value = false
+            } else if (variableSymbol.value.isNullOrBlank() && constantSymbol.value.isNullOrBlank()) {
+                this.value = true
+            }
+        }
+    }
+
+    val symbolsEnabled: LiveData<Boolean> = Transformations.map(paymentReference) {
+        it.isBlank()
+    }
+
+    private val resultMap = HashMap<String, String>()
 
 
     // observers need to be initialized here in order for them to be able to get destroyed in onCleared
@@ -117,7 +147,6 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
         val ibanLength = TransactionUtils.getIbanLength(ibanCountry)
         val length = iban.value?.length ?: 0
         _ibanLength.value = "$length/$ibanLength"
-
         _ibanColor.value = if (length != ibanLength) colorRed else colorPurple
         val value = TransactionUtils.isValidIban(iban.value ?: "")
         _ibanValid.value = value
@@ -126,17 +155,15 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
 
     private val amountObserver = Observer<String?> {
         val num = amount.value?.trim()?.replace(",+".toRegex(), ".") ?: ""
-        val isDouble = isDouble(num)
         val isValid = TransactionUtils.isValidAmount(num)
         _amountValid.value = isValid
-        val value = (amount.value?.trim() ?: "").isNotEmpty() && isDouble
         updateReqArray(isValid, 2)
     }
     private val variableSymbolObserver = Observer<String?> {
         _vsLength.value = "${variableSymbol.value?.length ?: '0'}"
         _vsColor.value = if (_vsLength.value!!.toInt() > 10) colorRed else colorPurple
         val num = variableSymbol.value ?: "0"
-        _vsValid.value = TransactionUtils.isNumeric(num)
+        _vsValid.value = TransactionUtils.isNumeric(num) || num.isBlank()
         updateReqArray(_vsValid.value!! && num.length <= 10, 3)
     }
 
@@ -144,7 +171,7 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
         _csLength.value = "${constantSymbol.value?.length ?: '0'}"
         _csColor.value = if (_csLength.value!!.toInt() > 4) colorRed else colorPurple
         val num = constantSymbol.value ?: "0"
-        _csValid.value = TransactionUtils.isNumeric(num)
+        _csValid.value = TransactionUtils.isNumeric(num) || num.isBlank()
         updateReqArray(_csValid.value!! && num.length <= 4, 4)
     }
 
@@ -152,7 +179,7 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
         _ssLength.value = "${specificSymbol.value?.length ?: '0'}"
         _ssColor.value = if (_ssLength.value!!.toInt() > 10) colorRed else colorPurple
         val num = specificSymbol.value ?: "0"
-        _ssValid.value = TransactionUtils.isNumeric(num)
+        _ssValid.value = TransactionUtils.isNumeric(num) || num.isBlank()
         updateReqArray(_ssValid.value!! && num.length <= 10, 5)
     }
 
@@ -182,11 +209,11 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
      * Prepares a [HashMap] which will be used to send data to the [QrGeneratorFragment].
      * @param currency Currency string is the only param not controlled by [LiveData], thus needs to be specified here
      */
-    fun prepareResultMap(currency: String): HashMap<String, String?> {
+    fun prepareResultMap(): HashMap<String, String?> {
         val amount = amount.value?.replace(",", ".")
         return hashMapOf(
             "amount" to amount,
-            "currency" to currency,
+            "currency" to currency.value,
             "iban" to iban.value,
             "beneficiary name" to recipientName.value,
             "variable symbol" to variableSymbol.value,
@@ -206,16 +233,6 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
         val oldArray = _reqFieldsValid.value?.clone() ?: booleanArrayOf(false, false, false, false, false, false)
         oldArray[position] = value
         _reqFieldsValid.value = oldArray
-    }
-
-    private fun isLong(string: String): Boolean {
-        val input = if (string.trim().isBlank()) "0" else string
-        return input.toLongOrNull() != null
-    }
-
-    private fun isDouble(string: String): Boolean {
-        val input = if (string.trim().isBlank()) "0" else string
-        return input.toDoubleOrNull() != null
     }
 
     /**

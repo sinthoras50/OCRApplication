@@ -16,14 +16,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.templateeditorapp.Template
 import com.example.templateeditorapp.db.AnnotatedImage
 import com.example.templateeditorapp.db.ImageDatabase
-import com.example.templateeditorapp.ui.camera.TemplateCameraFragment
 import com.example.templateeditorapp.ui.opencv.CameraFragment
 import com.example.templateeditorapp.utils.ImageUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
@@ -437,6 +436,21 @@ class EditorViewModel(val database: ImageDatabase) : ViewModel() {
         }
     }
 
+    /**
+     * This function creates a [Template] object using the data stored in this [ViewModel].
+     * The [filename] parameter specifies the filename to be assigned to the new Template.
+     * If the current bitmap has not been initialized, this function returns null.
+     *
+     * @param filename Filename of the template
+     * @return Returns a new [Template] or null
+     */
+    fun createTemplateFromData(filename: String): Template? {
+        if (::currentBitmap.isInitialized.not()) return null
+
+        val annotatedImage = AnnotatedImage(filename, boundingBoxes, cropRect)
+        return Template(annotatedImage, currentBitmap)
+    }
+
 
     /**
      * Loads a template with the given filename from the database, loads the corresponding image from the device's storage,
@@ -469,5 +483,29 @@ class EditorViewModel(val database: ImageDatabase) : ViewModel() {
 
             updateSpinnerItems(spinner)
         }
+    }
+
+    /**
+     * Loads and displays data from the specified [Template]. Updates the given [Spinner] accordingly.
+     *
+     * @param template The template to be loaded
+     * @param spinner The spinner to be updated
+     */
+    fun loadDataFromTemplate(template: Template, spinner: Spinner) {
+        currentBitmap = template.bitmap
+        boundingBoxes.apply {
+            clear()
+            addAll(template.annotatedImage.boundingBoxes)
+        }
+        cropRect = template.annotatedImage.cropRect
+
+        val mutableBitmap = currentBitmap.copy(Bitmap.Config.ARGB_8888, true)
+        _imageData.value = ImageData(mutableBitmap, Matrix(), false)
+        canvas = Canvas(mutableBitmap)
+        drawBoundingBoxes()
+        drawCropRect()
+
+        updateSpinnerItems(spinner)
+
     }
 }

@@ -26,13 +26,10 @@ import androidx.lifecycle.ViewModel
 import androidx.navigation.fragment.findNavController
 import com.example.templateeditorapp.OcrApp
 import com.example.templateeditorapp.R
-import com.example.templateeditorapp.SharedViewModel
+import com.example.templateeditorapp.SharedImageViewModel
 import com.example.templateeditorapp.databinding.FragmentEditorBinding
 import com.example.templateeditorapp.db.ImageDatabase
-import com.example.templateeditorapp.utils.OVERVIEW_KEY
-import com.example.templateeditorapp.utils.TAG_IMAGE
-import com.example.templateeditorapp.utils.TEMPLATE_KEY
-import com.example.templateeditorapp.utils.TEMP_PHOTO_KEY
+import com.example.templateeditorapp.utils.*
 import com.google.android.material.button.MaterialButton
 
 const val PICK_IMAGE = 1
@@ -47,7 +44,7 @@ class EditorFragment : Fragment() {
     private val mediumImageScale = 5.0f
     private val maxImageScale = 10.0f
 
-    private val sharedViewModel: SharedViewModel by activityViewModels()
+    private val sharedImageViewModel: SharedImageViewModel by activityViewModels()
 
     companion object {
         fun newInstance() = EditorFragment()
@@ -123,18 +120,20 @@ class EditorFragment : Fragment() {
 
         initializeDropdown()
 
-        val currentTemplate = arguments?.getString(TEMPLATE_KEY)
-
-        if (currentTemplate != null) {
-            viewModel.loadTemplate(currentTemplate, requireContext(), spinner)
+        val currentTemplate = arguments?.getString(TEMPLATE_KEY)?.let {
+            if (sharedImageViewModel.editMode) {
+                sharedImageViewModel.editMode = false
+                val template = sharedImageViewModel.loadTemplate(it)
+                viewModel.loadDataFromTemplate(template!!, spinner)
+            }
+            it
         }
 
-        val galleryResult = arguments?.getString(TEMP_PHOTO_KEY)
-
-        if (galleryResult != null) {
-            viewModel.handleImageResult(galleryResult, requireContext())
+        arguments?.getString(TEMP_PHOTO_KEY)?.let {
+            viewModel.handleImageResult(it, requireContext())
             viewModel.updateSpinnerItems(binding.spinnerFormFields)
         }
+
 
         viewModel.imageData.observe(viewLifecycleOwner) { imageData ->
             binding.loadedImage.setImageBitmap(imageData.bitmap)
@@ -230,14 +229,13 @@ class EditorFragment : Fragment() {
                 val filename = editText.text.toString()
 
                 if (filename.isNotBlank()) {
-                    viewModel.saveTemplate(filename, requireContext())
-                    dialog.dismiss()
+                    viewModel.createTemplateFromData(filename)?.let {
+                        sharedImageViewModel.saveTemplate(requireContext(), it)
+                        dialog.dismiss()
 
-                    val args = Bundle()
-                    args.putString(OVERVIEW_KEY, filename)
-
-                    Toast.makeText(requireContext(), "Template saved", Toast.LENGTH_SHORT).show()
-                    findNavController().navigate(R.id.action_editorFragment_to_overviewFragment, args)
+                        Toast.makeText(requireContext(), "Template saved", Toast.LENGTH_SHORT).show()
+                        findNavController().popBackStack()
+                     } ?: Toast.makeText(requireContext(), "Template could not be saved", Toast.LENGTH_SHORT).show()
                 }
             }
 
