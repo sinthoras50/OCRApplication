@@ -24,7 +24,7 @@ object TransactionUtils {
     private lateinit var countries: Map<String, Country>
 
     /**
-     * Initializes the <String, Country> [Map] of countries. Needs to be run after countries.json has been populated from [Assets]
+     * Initializes the <String, Country> [Map] of countries. Needs to be run after countries.json has been populated from the [Assets]
      * @param context Application context
      */
     fun initCountries(context: Context) {
@@ -128,7 +128,7 @@ object TransactionUtils {
      * @return Returns `true` if the number is a valid number, `false` otherwise
      */
     fun isNumeric(num: String): Boolean {
-        return num.all { char -> char.isDigit() }
+        return if (num.isBlank()) false else num.all { char -> char.isDigit() }
     }
 
     /**

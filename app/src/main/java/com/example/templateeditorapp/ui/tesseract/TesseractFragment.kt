@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.AdapterView
 import androidx.activity.OnBackPressedCallback
 import androidx.core.graphics.toRect
 import androidx.fragment.app.Fragment
@@ -108,6 +109,16 @@ class TesseractFragment : Fragment() {
 
         initializeCurrencyDropdown()
 
+        binding.amountCurrencySpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                viewModel.currency.value = parent?.getItemAtPosition(position).toString()
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+                viewModel.currency.value = "EUR"
+            }
+        }
+
         viewModel.progress.observe(viewLifecycleOwner) { progress ->
             Log.d(TAG_IMAGE, "progress = $progress")
             binding.transactionProgress.setProgress(progress, true)
@@ -116,9 +127,7 @@ class TesseractFragment : Fragment() {
         binding.btnConfirmForm.setOnClickListener {
 
             val args = Bundle()
-            val currency = binding.amountCurrencySpinner.selectedItem.toString()
-            Log.d(TAG_IMAGE, "currency = $currency")
-            args.putSerializable(OCR_MAP_KEY, viewModel.prepareResultMap(currency))
+            args.putSerializable(OCR_MAP_KEY, viewModel.prepareResultMap())
 
             findNavController().navigate(R.id.action_tesseractFragment_to_qrGeneratorFragment, args)
         }

@@ -3,6 +3,7 @@
     <string name="capture_an_image">Capture an image.</string>
     <string name="toggle_auto_focus">Toggle auto focus.</string>
     <string name="switch_flash_mode">Switch flash mode.</string>
+    <string name="payment_reference_disabled">VS/CS/SS must be empty</string>
     <string name="clear_bounding_box">Clear previously assigned bounding box.</string>
     <string name="rotate_img">Rotate the image right by 90 degrees</string>
     <string name="field_name">Field name</string>
@@ -17,6 +18,7 @@
     <string name="next_template">Switch to next template</string>
     <string name="create_template">Create a new template.</string>
     <string name="new_layout">New Layout</string>
+    <string name="symbols_disabled">Payment ref. must be empty</string>
     <string name="select_template_desc">Select an image to be used as a template</string>
     <string name="gallery">Gallery</string>
     <string name="camera">Camera</string>
