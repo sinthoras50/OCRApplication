@@ -4,6 +4,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteException
 import android.graphics.Bitmap
 import android.graphics.RectF
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -50,7 +51,11 @@ class SharedImageViewModel(val database: ImageDatabase) : ViewModel() {
         viewModelScope.launch {
             annotatedImages.addAll(database.annotatedImageDao().getAllImages())
 
-            if (annotatedImages.isEmpty()) return@launch
+            if (annotatedImages.isEmpty()) {
+                Log.d("DBTEST", "db is empty why??")
+                _isLoading.value = false
+                return@launch
+            }
 
             _currentIdx.value = 0
             currentImageBoundingBox = annotatedImages[_currentIdx.value!!].cropRect
@@ -177,10 +182,8 @@ class SharedImageViewModel(val database: ImageDatabase) : ViewModel() {
         _currentImageName.value = if (annotatedImages.size > 0) annotatedImages[_currentIdx.value!!].imageName else ""
         _imageSet.value = updatedList
 
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                currentHighResBitmap = ImageUtils.loadPhoto(_currentImageName.value!!, context)
-            }
+        viewModelScope.launch(Dispatchers.IO) {
+            currentHighResBitmap = ImageUtils.loadPhoto(_currentImageName.value!!, context)
         }
 
         return true
@@ -199,10 +202,8 @@ class SharedImageViewModel(val database: ImageDatabase) : ViewModel() {
         currentImageBoundingBox = annotatedImages[_currentIdx.value!!].cropRect
         _currentImageName.value = annotatedImages[_currentIdx.value!!].imageName
 
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                currentHighResBitmap = ImageUtils.loadPhoto(_currentImageName.value!!, context)
-            }
+        viewModelScope.launch(Dispatchers.IO) {
+            currentHighResBitmap = ImageUtils.loadPhoto(_currentImageName.value!!, context)
         }
 
 
@@ -222,10 +223,8 @@ class SharedImageViewModel(val database: ImageDatabase) : ViewModel() {
         currentImageBoundingBox = annotatedImages[_currentIdx.value!!].cropRect
         _currentImageName.value = annotatedImages[_currentIdx.value!!].imageName
 
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                currentHighResBitmap = ImageUtils.loadPhoto(_currentImageName.value!!, context)
-            }
+        viewModelScope.launch(Dispatchers.IO) {
+            currentHighResBitmap = ImageUtils.loadPhoto(_currentImageName.value!!, context)
         }
 
         return true

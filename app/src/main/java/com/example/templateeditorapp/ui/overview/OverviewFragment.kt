@@ -16,6 +16,7 @@ import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DiffUtil
 import androidx.viewpager.widget.ViewPager
 import com.example.templateeditorapp.OcrApp
 import com.example.templateeditorapp.R
@@ -84,9 +85,12 @@ class OverviewFragment : Fragment() {
         binding.viewPager.isUserInputEnabled = false
 
         viewModel.imageSet.observe(viewLifecycleOwner) { imageSet ->
+            val oldImages = images.toList()
             images.clear()
             images.addAll(imageSet)
-            adapter.notifyDataSetChanged()
+            val diffResult = DiffUtil.calculateDiff(ImageDiffCallback(oldImages, images))
+            diffResult.dispatchUpdatesTo(adapter)
+//            adapter.notifyDataSetChanged()
             binding.overviewLoadingPanel.visibility = View.GONE
             binding.viewPager.setCurrentItem(viewModel.currentIdx.value!!, false)
         }

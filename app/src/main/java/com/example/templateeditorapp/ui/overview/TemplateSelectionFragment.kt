@@ -3,11 +3,11 @@ package com.example.templateeditorapp.ui.overview
 import android.app.Activity
 import android.content.ContentResolver
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Canvas
-import android.graphics.Matrix
+import android.graphics.*
+import android.graphics.pdf.PdfDocument
+import android.graphics.pdf.PdfRenderer
 import android.os.Bundle
+import android.os.ParcelFileDescriptor
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
@@ -27,6 +27,9 @@ import com.example.templateeditorapp.utils.ImageUtils
 import com.example.templateeditorapp.utils.TAG_IMAGE
 import com.example.templateeditorapp.utils.TEMP_PHOTO_KEY
 import com.example.templateeditorapp.utils.TEMP_PHOTO_PATH
+import java.io.File
+import java.net.URI
+
 
 /**
  * A fragment to allow the user to select an image for template creation in [EditorFragment]
@@ -84,8 +87,9 @@ class TemplateSelectionFragment : Fragment() {
      * Start an image picker activity to allow the user to select an image
      */
     private fun pickImage() {
-        val intent = Intent(Intent.ACTION_GET_CONTENT)
-        intent.type = "image/*"
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+        intent.type = "*/*"
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/*", "application/pdf"))
         startActivityForResult(intent, PICK_IMAGE)
     }
 
@@ -103,13 +107,36 @@ class TemplateSelectionFragment : Fragment() {
         val ctx = requireContext()
 
         if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_OK) {
-            val imageUri = data?.data
-            val imageStream = imageUri?.let { ctx.contentResolver.openInputStream(it) }
-            val selectedBitmap = BitmapFactory.decodeStream(imageStream)
-            val result = ImageUtils.savePhoto(TEMP_PHOTO_PATH, selectedBitmap, ctx)
-            Log.d(TAG_IMAGE, "result = $result")
+            val uri = data?.data
+            val mimeType = uri?.let { ctx.contentResolver.getType(it) }
             val args = Bundle()
+            Log.d("IMAGE", "data type = $mimeType")
+
+            if (mimeType == "application/pdf") {
+                val fileDescriptor = uri.let { ctx.contentResolver.openFileDescriptor(it, "r")}
+                val doc = PdfRenderer(fileDescriptor!!)
+
+                val page = doc.openPage(0)
+                val width = page.width * 2
+                val height = page.height * 2
+                val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                val canvas = Canvas(bitmap)
+                canvas.drawColor(Color.WHITE)
+                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_PRINT)
+                Log.d("PDF", "page count = ${doc.pageCount}")
+                page.close()
+                doc.close()
+
+                ImageUtils.savePhoto(TEMP_PHOTO_PATH, bitmap, ctx)
+            } else if (mimeType?.startsWith("image/") == true) {
+                val imageStream = uri.let { ctx.contentResolver.openInputStream(it) }
+                val selectedBitmap = BitmapFactory.decodeStream(imageStream)
+
+                ImageUtils.savePhoto(TEMP_PHOTO_PATH, selectedBitmap, ctx)
+            }
+
             args.putString(TEMP_PHOTO_KEY, TEMP_PHOTO_PATH)
+
 
             findNavController().navigate(R.id.action_templateSelectionFragment_to_editorFragment, args)
 

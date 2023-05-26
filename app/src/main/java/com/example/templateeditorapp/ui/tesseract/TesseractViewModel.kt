@@ -211,6 +211,7 @@ class TesseractViewModel(private val database: ImageDatabase) : ViewModel() {
      */
     fun prepareResultMap(): HashMap<String, String?> {
         val amount = amount.value?.replace(",", ".")
+        Log.d("CURRENCY", "currency = ${currency.value} amount = $amount")
         return hashMapOf(
             "amount" to amount,
             "currency" to currency.value,

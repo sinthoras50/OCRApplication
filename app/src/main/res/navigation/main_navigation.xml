@@ -38,13 +38,6 @@
         android:label="CameraFragment"
         tools:layout="@layout/fragment_camera" >
         <action
-            android:id="@+id/action_cameraFragment_to_testingFragment"
-            app:destination="@id/testingFragment"
-            app:enterAnim="@android:anim/slide_in_left"
-            app:exitAnim="@android:anim/slide_out_right"
-            app:popEnterAnim="@android:anim/slide_in_left"
-            app:popExitAnim="@android:anim/slide_out_right" />
-        <action
             android:id="@+id/action_cameraFragment_to_tesseractFragment"
             app:destination="@id/tesseractFragment"
             app:enterAnim="@android:anim/slide_in_left"
@@ -61,11 +54,6 @@
             android:id="@+id/action_editorFragment_to_overviewFragment"
             app:destination="@id/overviewFragment" />
     </fragment>
-    <fragment
-        android:id="@+id/testingFragment"
-        android:name="com.example.templateeditorapp.ui.testing.TestingFragment"
-        android:label="TestingFragment"
-        tools:layout="@layout/fragment_testing"/>
     <fragment
         android:id="@+id/templateSelectionFragment"
         android:name="com.example.templateeditorapp.ui.overview.TemplateSelectionFragment"
