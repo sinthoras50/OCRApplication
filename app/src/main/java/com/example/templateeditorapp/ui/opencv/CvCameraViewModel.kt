@@ -85,7 +85,7 @@ class CameraViewModel(val database: RoomDatabase) : ViewModel() {
      * @param cropRect the rectangle defining the region to be cropped
      * @return a new Mat image containing the cropped region
      */
-    fun cropImage(image: Mat, cropRect: Rect): Mat {
+    private fun cropImage(image: Mat, cropRect: Rect): Mat {
         val opencvRect = cropRect.let {
             org.opencv.core.Rect(it.left, it.top, it.width(), it.height())
         }
@@ -197,10 +197,10 @@ class CameraViewModel(val database: RoomDatabase) : ViewModel() {
      *
      * @return The preprocessed image as a `Mat` object.
      */
-    fun preprocess(mat: Mat, method: PreprocessMethod): Mat {
+    fun preprocess(mat: Mat, method: PreprocessMethod, cropped: Boolean = false): Mat {
         return when(method) {
             PreprocessMethod.NONE -> mat
-            PreprocessMethod.THRESH -> thresh(mat)
+            PreprocessMethod.THRESH -> thresh(mat, cropped)
             PreprocessMethod.HOUGH -> hough(mat)
             PreprocessMethod.MORPH -> morph(mat)
         }
@@ -213,11 +213,18 @@ class CameraViewModel(val database: RoomDatabase) : ViewModel() {
      * @param mat the input image as a [Mat] object.
      * @return the preprocessed image as a [Mat] object.
      */
-    private fun thresh(mat: Mat): Mat {
+    private fun thresh(mat: Mat, cropped: Boolean): Mat {
         val gray = Mat()
         Imgproc.cvtColor(mat, gray, Imgproc.COLOR_RGB2GRAY)
         val thresh = Mat()
-        Imgproc.threshold(gray, thresh, 0.0, 255.0, Imgproc.THRESH_BINARY_INV+Imgproc.THRESH_OTSU)
+
+        if (cropped) {
+            Imgproc.threshold(gray, thresh, 0.0, 255.0, Imgproc.THRESH_BINARY_INV+Imgproc.THRESH_OTSU)
+            Log.d("THRESH", "using otsu thresholding")
+        } else {
+            Imgproc.adaptiveThreshold(gray, thresh, 255.0, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY_INV, 11, 3.0)
+            Log.d("THRESH", "using adaptive thresholding")
+        }
 
         thresh.copyTo(preprocessMat)
 

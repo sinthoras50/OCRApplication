@@ -286,7 +286,7 @@ class CameraFragment : Fragment(), CameraBridgeViewBase.CvCameraViewListener2, P
             return@onPictureTaken
         }
 
-        val resultMat = viewModel.preprocess(alignedMat, PreprocessMethod.THRESH)
+        val resultMat = viewModel.preprocess(alignedMat, PreprocessMethod.THRESH, cropRect != null)
         val resultBitmap = ImageUtils.matToBitmap(resultMat)
 
         ImageUtils.savePhoto(TEMP_PHOTO_PATH, resultBitmap!!, requireContext())
