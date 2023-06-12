@@ -44,6 +44,9 @@
             app:exitAnim="@android:anim/slide_out_right"
             app:popEnterAnim="@android:anim/slide_in_left"
             app:popExitAnim="@android:anim/slide_out_right" />
+        <action
+            android:id="@+id/action_cameraFragment_to_testingFragment"
+            app:destination="@id/testingFragment" />
     </fragment>
     <fragment
         android:id="@+id/editorFragment"
@@ -108,4 +111,8 @@
         android:name="com.example.templateeditorapp.ui.qrgen.QrGeneratorFragment"
         android:label="fragment_qr_generator"
         tools:layout="@layout/fragment_qr_generator" />
+    <fragment
+        android:id="@+id/testingFragment"
+        android:name="com.example.templateeditorapp.ui.testing.TestingFragment"
+        android:label="TestingFragment" />
 </navigation>

@@ -2,6 +2,8 @@ package com.example.templateeditorapp.utils
 
 import android.content.Context
 import android.content.res.AssetManager
+import android.graphics.BitmapFactory
+import android.graphics.RectF
 import com.example.templateeditorapp.db.AnnotatedImage
 import com.example.templateeditorapp.db.ImageDatabase
 import com.example.templateeditorapp.ui.editor.BoundingBox
@@ -54,7 +56,20 @@ object Assets {
             boundingBoxes.add(BoundingBox(field.x0, field.y0, field.x1, field.y1, field.fieldName))
         }
 
-        val annotatedImage = AnnotatedImage("Postal Cheque", boundingBoxes, null)
+        val image = File("${getDataPath(context)}/Postal Cheque.png")
+        val bytes = image.readBytes()
+
+        val options = BitmapFactory.Options()
+        options.inJustDecodeBounds = true
+
+        BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)
+
+        val width = options.outWidth
+        val height = options.outHeight
+
+        val annotatedImage = AnnotatedImage("Postal Cheque", boundingBoxes, RectF(
+            0f, 0f, width.toFloat()-0f, height.toFloat()-0f)
+        )
 
         GlobalScope.launch {
             db.annotatedImageDao().insertImage(annotatedImage)

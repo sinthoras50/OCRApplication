@@ -298,6 +298,8 @@ class CameraFragment : Fragment(), CameraBridgeViewBase.CvCameraViewListener2, P
         args.putParcelable(CROP_RECT_KEY, cropRect)
         findNavController().navigate(R.id.action_cameraFragment_to_tesseractFragment, args)
 
+//        findNavController().navigate(R.id.action_cameraFragment_to_testingFragment, args)
+
     }
 
 }

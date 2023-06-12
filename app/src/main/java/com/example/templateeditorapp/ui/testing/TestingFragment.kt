@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import com.example.templateeditorapp.databinding.FragmentTestingBinding
 import com.example.templateeditorapp.ui.opencv.PictureTakenListener
 import com.example.templateeditorapp.utils.ImageUtils
+import com.example.templateeditorapp.utils.TEMP_PHOTO_KEY
 
 class TestingFragment : Fragment() {
 
@@ -32,7 +33,7 @@ class TestingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val imagePath = arguments?.getString("image")
+        val imagePath = arguments?.getString(TEMP_PHOTO_KEY)
         val bitmap = ImageUtils.loadPhoto(imagePath!!, requireContext())
         binding.testingImageView.setImageBitmap(bitmap)
     }

@@ -101,11 +101,10 @@ class CameraViewModel(val database: RoomDatabase) : ViewModel() {
      * @param mat1 The first input image
      * @param mat2 The second input image to be aligned with the first image
      * @param maxFeatures The maximum number of features to be detected by ORB
-     * @param keepPercent The percentage of the best feature matches to be kept for computing the homography matrix
      * @param cropRect Optional crop rectangle to apply to the second image before alignment
      * @return The aligned output image
      */
-    fun alignImage(mat1: Mat, mat2: Mat, maxFeatures: Int = 500, keepPercent: Double = 0.2, cropRect: RectF? = null): Mat? {
+    fun alignImage(mat1: Mat, mat2: Mat, maxFeatures: Int = 500,  cropRect: RectF? = null): Mat? {
         var croppedTemplate = Mat()
 
         if (cropRect != null) {
@@ -117,7 +116,7 @@ class CameraViewModel(val database: RoomDatabase) : ViewModel() {
         val resizedImage = Mat()
         val resizedTemplate = Mat()
 
-        val desiredWidth = min(mat1.width(), template.width()).toDouble()
+        val desiredWidth = min(mat1.width(), min(template.width(), 2000)).toDouble()
         val aspectRatio1 = mat1.width().toDouble() / mat1.height()
         val aspectRatio2 = template.width().toDouble() / template.height()
 
@@ -130,45 +129,10 @@ class CameraViewModel(val database: RoomDatabase) : ViewModel() {
         Imgproc.cvtColor(resizedImage, grayImage, Imgproc.COLOR_RGB2GRAY)
         Imgproc.cvtColor(resizedTemplate, grayTemplate, Imgproc.COLOR_RGB2GRAY)
 
+        val matcher = SIFTMatcher(grayImage, grayTemplate, maxFeatures)
+        val matchedPoints = matcher.matchedPoints() ?: return null
 
-        val orb = ORB.create(maxFeatures)
-        val kp1 = MatOfKeyPoint()
-        val kp2 = MatOfKeyPoint()
-        val descsA = Mat()
-        val descsB = Mat()
-        orb.detectAndCompute(grayImage, Mat(), kp1, descsA)
-        orb.detectAndCompute(grayTemplate, Mat(), kp2, descsB)
-
-        val matcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMING)
-        val matches = MatOfDMatch()
-        matcher.match(descsA, descsB, matches)
-
-        val matchesList = matches.toList()
-        matchesList.sortBy { it.distance }
-
-        val reducedMatches = matchesList.subList(0, (keepPercent * matchesList.size).toInt())
-
-        // findHomography requires at least 4 matches, so we return null
-        if (reducedMatches.size < 4) return null
-
-        // homography matrix
-        val pts1 = mutableListOf<Point>()
-        val pts2 = mutableListOf<Point>()
-
-        val keypoints1 = kp1.toArray()
-        val keypoints2 = kp2.toArray()
-
-
-        Log.d("HOMOGRAPHY", "matches length = ${reducedMatches.size}")
-        for (match in reducedMatches) {
-            pts1.add(keypoints1[match.queryIdx].pt)
-            pts2.add(keypoints2[match.trainIdx].pt)
-        }
-
-        val pts1Mat = MatOfPoint2f(*pts1.toTypedArray())
-        val pts2Mat = MatOfPoint2f(*pts2.toTypedArray())
-
-        val model = Calib3d.findHomography(pts1Mat, pts2Mat, Calib3d.RANSAC, 5.0)
+        val model = Calib3d.findHomography(matchedPoints[0], matchedPoints[1], Calib3d.RANSAC, 5.0)
 
         Log.d("HOMOGRAPHY", "model = ${model.width()}, ${model.height()}, ${model.type()}")
 
@@ -219,10 +183,12 @@ class CameraViewModel(val database: RoomDatabase) : ViewModel() {
         val thresh = Mat()
 
         if (cropped) {
+//            Imgproc.adaptiveThreshold(gray, thresh, 255.0, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY_INV, 11, 10.0)
             Imgproc.threshold(gray, thresh, 0.0, 255.0, Imgproc.THRESH_BINARY_INV+Imgproc.THRESH_OTSU)
             Log.d("THRESH", "using otsu thresholding")
         } else {
-            Imgproc.adaptiveThreshold(gray, thresh, 255.0, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY_INV, 11, 3.0)
+//            Imgproc.threshold(gray, thresh, 0.0, 255.0, Imgproc.THRESH_BINARY_INV+Imgproc.THRESH_OTSU)
+            Imgproc.adaptiveThreshold(gray, thresh, 255.0, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY_INV, 11, 10.0)
             Log.d("THRESH", "using adaptive thresholding")
         }
 
